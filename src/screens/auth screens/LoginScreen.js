@@ -7,7 +7,14 @@ import mystyles from '../../css/mystyles'
 
 
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
+  const [usr, setusr] = useState('')
+  const [pwd, setpwd] = useState('')
+
+  const  Login=()=>{
+
+    navigation.navigate('TabScreen')
+  }
 
 
   return (
@@ -21,15 +28,16 @@ const LoginScreen = () => {
         </View>
 
 
-          <Text style={{fontSize:25, fontWeight:'600', color:'skyblue',textAlign:'center'}}> Let's Sign you in </Text>
+          <Text style={{fontSize:25, fontWeight:'600', color:'navy',textAlign:'center'}}> Let's Sign you in </Text>
           <Text style={{fontSize:15, fontWeight:'500', color:'gray',textAlign:'center'}}> Enter Below Details to continue.. </Text>
 
           <View style={{ margin:10,elevation:5}}>
             <TextInput
             placeholder='Username' 
-            style={{borderWidth:1, borderColor:'gray', fontSize:15, fontWeight:'600',
+            style={{borderWidth:1.5, borderColor:'gray', fontSize:15, fontWeight:'600',
                     borderRadius:15, padding:10, paddingHorizontal:20
                   }}
+            onChange={(text)=>{ setusr(text)}}
             />
           </View>
 
@@ -38,15 +46,22 @@ const LoginScreen = () => {
             placeholder='Password'
             placeholderTextColor={'gray'} 
 
-            style={{borderWidth:1, borderColor:'gray', fontSize:15, fontWeight:'600',
+            style={{borderWidth:1.5, borderColor:'gray', fontSize:15, fontWeight:'600',
                     borderRadius:15, padding:10, paddingHorizontal:20
                   }}
+
+            onChange={(text)=>{ setpwd(text)}}
+
             />
           </View>
 
 
 
-          <Pressable style={{ margin:10,marginTop:1 ,elevation:5}}>
+          <Pressable style={{ margin:10,marginTop:1 ,elevation:5}}
+          onPressIn={()=>{
+            Login()
+          }}
+          >
             <View
             style={{borderWidth:.2, borderColor:'gray', backgroundColor:'navy',
                     borderRadius:25, padding:15, paddingHorizontal:20

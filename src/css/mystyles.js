@@ -5,11 +5,11 @@ const mystyles = StyleSheet.create({
     container: {
       flex: 1,
       paddingTop: 12,
-      marginHorizontal:10,
+      paddingHorizontal:10,
       backgroundColor: '#f4f7fc',
     },
     title: {
-      color: 'navy',
+      color: '#1f65ff',
       textAlign: 'left',
       fontSize: 24,
       fontWeight: 'bold',

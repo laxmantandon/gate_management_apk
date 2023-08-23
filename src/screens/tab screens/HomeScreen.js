@@ -1,22 +1,147 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image, Pressable, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Feather from 'react-native-vector-icons/Feather'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import mystyles from '../../css/mystyles'
+import { AuthContext } from '../../components/context'
+import AsyncStorage from '@react-native-community/async-storage'
+import moment from 'moment'
+import { Colors } from '../../contants'
 
 
 
-const HomeScreen = () => {
-  const [taskData, settaskData] = useState([{ title: 'My First Task', status: 'Completed', statuscolor: "navy", icon: 'camera' },
+const HomeScreen = ({navigation}) => {
+  const [taskData, settaskData] = useState([{ title: 'My First Task', status: 'Completed', statuscolor: "#1f65ff", icon: 'camera' },
   { title: 'My Second Task', status: 'Pending', statuscolor: "orange", icon: 'camera' },
   { title: 'My Third Task', status: 'Overdue', statuscolor: "red", icon: 'camera' }
   ])
-  const [ScreensData, setScreensData] = useState([{ title: 'Lead', status: 'Completed', icon: 'Leave', image: require('../../assets/img/attraction.png') },
-  { title: 'Opportunity', status: 'Pending', icon: 'camera', image: require('../../assets/img/opportunity.png') },
-  { title: 'quotation', status: 'Completed', icon: 'camera', image: require('../../assets/img/project-management.png') },
-  { title: 'Sales Order', status: 'Completed', icon: 'camera', image: require('../../assets/img/order.png') },
+  const [ScreensData, setScreensData] = useState([
+  { title: 'Lead', status: 'Completed', icon: 'Leave', route:'Lead', image: require('../../assets/img/attraction.png') },
+  { title: 'Opportunity', status: 'Pending', icon: 'camera', route:'OpportunityScreen', image: require('../../assets/img/opportunity.png') },
+  { title: 'quotation', status: 'Completed', icon: 'camera', route:'Lead', image: require('../../assets/img/project-management.png') },
+  { title: 'Sales Order', status: 'Completed', icon: 'camera', route:'SalesInvoiceScreen', image: require('../../assets/img/order.png') },
   ])
+
+  const { signOut } = React.useContext(AuthContext);
+  const [session_started, setsession_started] = useState(false)
+  const [session, setsession] = useState(0)
+  const [sessionTimes, setsessionTimes] = useState(0)
+
+
+  useEffect(() => {
+    Checkuser()
+    AsyncStorage.getItem("user_session").then((value) => {
+      // console.log('session', value)
+      const a_session = JSON.parse(value)
+      if (a_session) {
+        setsession_started(true)
+        setsession(a_session)
+      } else {
+        setsession_started(false)
+
+      }
+    })
+    getcurrentTime()
+  }, [])
+
+
+  // const getTaskData = () => {
+  //   var myHeaders = new Headers();
+  //   var requestOptions = {
+  //     method: 'GET',
+  //     headers: myHeaders,
+  //     redirect: 'follow'
+  //   };
+
+  //   fetch("https://dbh.erevive.cloud/api/resource/Task?fields=[\"*\"]&filter={'modified_by':'kamesh@erevive.in'}", requestOptions)
+  //     .then(response => response.text())
+  //     .then(result => {
+  //       console.log(result)
+
+  //       let m = JSON.parse(result)
+  //       // console.log(m.data)
+  //       mapped_array = []
+  //       setresponseData(m?.data)
+  //       m.data.forEach(a => {
+  //         // console.log(a)
+  //         mapped_array.push({data:a, title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, date: a.creation, whatsapp: a.whatsapp_no, call: a.mobile_no })
+  //       });
+  //       setListData(mapped_array)
+
+
+
+  //     })
+  //     .catch(error => console.log('error', error));
+
+
+
+  // }
+
+
+  const getcurrentTime=()=>{
+    setTimeout(() => {
+     AsyncStorage.getItem("user_session").then((value) => {
+       // setsession(JSON.parse(value))
+       let duration = moment.duration(moment(new Date()).diff(moment(JSON.parse(value)).add(1, 'second')))
+       if (duration){
+           setsessionTimes(duration.asHours())
+       }
+     })
+     getcurrentTime()
+   
+    }, 10000);
+   }
+
+  const Checkuser=()=>{
+    var myHeaders = new Headers();    
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+    fetch("https://dbh.erevive.cloud/api/method/frappe.auth.get_logged_user", requestOptions)
+      .then(response => response.text())
+      .then(result =>{ console.log(result)
+        m=JSON.parse(result)
+        if(!m?.message){
+          signOut()
+          
+        }
+      })
+      .catch(error => console.log('error', error));
+  }
+
+  const SessionToggle =()=>{
+    let m_text=session_started?'Start Day! ':'End Day!'
+    let x_text=session_started?'Are you sure you want to Check Out?':'Are you sure you want to start Day?'
+    Alert.alert(m_text, x_text, [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      { text: 'YES', onPress: () => SessionSwitch() },
+    ]);
+
+  }
+
+  const SessionSwitch=()=>{
+    if(session_started){
+        AsyncStorage.removeItem('user_session')
+        setsession(0)
+        setsession_started(false)
+    }else{
+      let current_time = new Date()
+      let stime = `${current_time.toISOString().split('T')[0]} ${current_time.toTimeString().slice(0, 5)}`
+      AsyncStorage.setItem('user_session', JSON.stringify(stime)).then(s => {
+        setsession_started(true)
+        setsession(stime)
+      })
+       
+    }
+  }
+  
 
   return (
     <SafeAreaView style={mystyles.container}>
@@ -28,47 +153,49 @@ const HomeScreen = () => {
       />
 
       <ScrollView>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={[mystyles.title, { width: '85%' }]}>Isha Kitchen ( DBH )</Text>
-          <View style={{ flex: 1, flexDirection: 'row', marginLeft: 'auto' }}>
-            <Icon name='notifications-none' color="#929eb4" size={25} />
-            <Icon name='help-outline' color="#45a1f3" size={25} />
-          </View>
+        
+
+        <View style={{ backgroundColor: 'white', padding: 15, marginBottom: 20, borderRadius: 25, elevation: 4 }}>
+
+          <Text style={{ fontSize: 14, fontWeight: '600', color: 'black' }} >Good Evening,</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }} >Kamesh Kumar</Text>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: '#929eb4', paddingTop: 10 }} >{session_started?'You Started Your Day at':`Start Your Today's Session`} </Text>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1f65ff' }} >{session_started?session:''}</Text>
+
+
+         <Pressable onPress={()=>{
+          SessionToggle()
+         }}>
+         <View
+          
+          style={{
+            padding: 12, paddingHorizontal: 80, flexDirection: 'row', alignSelf: 'center',
+            borderColor: session_started?'red':Colors.DEFAULT_BLUE, borderWidth: 1, borderRadius: 25, margin: 10
+          }}>
+          <Icon name='settings-power' color={ session_started?'red':Colors.DEFAULT_BLUE} size={25} />
+          <Text style={{ fontSize: 15, color: session_started?'red':Colors.DEFAULT_BLUE, paddingHorizontal: 5,
+              paddingTop: 1, textAlign: 'center', fontWeight: '600' }}>
+            {session_started?'Check-Out':'Check-In'}
+          </Text>
+
         </View>
-
-        <View style={{ backgroundColor: 'white', padding: 15, marginVertical: 20, borderRadius: 25, elevation: 4 }}>
-
-          <Text style={{ fontSize: 15, fontWeight: '600', color: 'black' }} >Good Evening,</Text>
-          <Text style={{ fontSize: 22, fontWeight: 'bold', color: 'black' }} >Kamesh Kumar</Text>
-          <Text style={{ fontSize: 15, fontWeight: '600', color: '#929eb4', paddingTop: 8 }} >You Started Your Day at</Text>
-          <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#45a1f3' }} >12:27PM</Text>
-
-
-          <View
-            style={{
-              padding: 12, paddingHorizontal: 80, flexDirection: 'row', alignSelf: 'center',
-              borderColor: 'red', borderWidth: 1, borderRadius: 25, margin: 10
-            }}>
-            <Icon name='settings-power' color="red" size={25} />
-            <Text style={{ fontSize: 15, color: 'red', paddingHorizontal: 5, paddingTop: 1, textAlign: 'center', fontWeight: '600' }}>
-              Check-Out
-            </Text>
-
-          </View>
+         </Pressable>
 
         </View>
 
 
 
         <View>
-          <View style={{ flexDirection: "row", }}>
-            <Text style={{ width: "80%", fontSize: 18, color: 'gray', fontWeight: 'bold' }}>
+          <View style={{ flexDirection: "row",paddingHorizontal:10 , paddingTop:10}}>
+            <Text style={{  fontSize: 16, color: 'gray', fontWeight: 'bold' }}>
               Your Task
             </Text>
-
-            <Text style={{ width: "20%", fontSize: 18, color: 'navy', fontWeight: 'bold' }}>
+<Pressable style={{marginLeft:'auto' }} onPress={()=>{ navigation.navigate('TaskScreen')}}>
+<Text style={{marginLeft:'auto',  fontSize: 16, color: '#1f65ff', fontWeight: 'bold' }}>
               View All
             </Text>
+</Pressable>
+            
           </View>
 
           <FlatList
@@ -77,13 +204,15 @@ const HomeScreen = () => {
 
             renderItem={({ item }) => {
               return (
-                <View style={{ backgroundColor: 'skyblue', width: 320, marginVertical: 10, elevation: 4, borderRadius: 25, marginRight: 15, }}>
+                <Pressable 
+                onPress={()=>{navigation.navigate('TaskDetails', item={item})}}
+                style={{ backgroundColor: 'skyblue', width: 320, marginVertical: 10, elevation: 4, borderRadius: 25, marginRight: 15, }}>
                   <View style={{
                     paddingHorizontal: 15, paddingTop: 15,
                   }}>
                     <View style={{ flexDirection: 'row', paddingBottom: 20 }}>
                       <View style={{ padding: 5, backgroundColor: '#f4f7fc', borderRadius: 100 }}>
-                        <Icon name="task" size={35} color={'navy'} />
+                        <Icon name="task" size={35} color={'#1f65ff'} />
                       </View>
                       <View style={{
                         backgroundColor: item.statuscolor, borderWidth: 0, padding: 3, paddingHorizontal: 15,
@@ -120,7 +249,7 @@ const HomeScreen = () => {
                     </View>
                   </View>
 
-                </View>
+                </Pressable>
 
               )
             }}
@@ -132,8 +261,8 @@ const HomeScreen = () => {
 
 
         <View style={{ marginTop: 20 }}>
-          <View style={{ flexDirection: "row", }}>
-            <Text style={{ width: "80%", fontSize: 18, color: 'gray', fontWeight: 'bold' }}>
+          <View style={{ flexDirection: "row",paddingHorizontal:10  }}>
+            <Text style={{  fontSize: 18, color: 'gray', fontWeight: 'bold' }}>
               What would you like to do?
             </Text>
           </View>
@@ -144,15 +273,19 @@ const HomeScreen = () => {
             renderItem={({ item }) => {
 
               return (
-                <View style={{ backgroundColor: 'white', flex: 1, margin: 5, marginTop: 10, padding: 5, elevation: 4, borderRadius: 18 }}>
+                <Pressable
+                onPress={()=>{
+                  navigation.navigate(item.route)
+                }}
+                 style={{ backgroundColor: 'white', flex: 1, margin: 5, marginTop: 10, padding: 5, elevation: 4, borderRadius: 18 }}>
                   <View style={{ padding: 10, paddingBottom: 1, alignItems: 'center', height: 50 }}>
                     {/* <Icon name="camera" size={30} /> */}
                     <Image source={item.image} style={{ width: 30, height: 30 }} />
                   </View>
-                  <Text style={{ textAlign: 'center', fontWeight: '600' }}>{item.title}</Text>
+                  <Text style={{ textAlign: 'center', fontWeight: '600', color:'navy' }}>{item.title}</Text>
 
 
-                </View>
+                </Pressable>
               )
 
             }}
