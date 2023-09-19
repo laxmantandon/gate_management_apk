@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Alert, Modal, FlatList, ToastAndroid, ScrollView, RefreshControl } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Card from './Card';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Button } from 'react-native-paper';
@@ -28,10 +28,35 @@ const CartScreen = ({ item }) => {
   useEffect(() => {
     console.log(item?.value)
     if(item?.value){
-      setproductsList(item?.value)
+      mapped_array=[]
+      item?.value.forEach(a => {
+        a.title= a.item_name
+        a.status='Add to cart'
+        a.percent=a.qty
+        a.rate=a.standard_rate
+        a.subtitle = `Price - ${a.standard_rate}`
+      });
     }
     getFormData()
   }, [])
+
+
+  useCallback(() => {
+    if(item?.value){
+      mapped_array=[]
+      item?.value.forEach(a => {
+        a.title= a.item_name
+        a.status='Add to cart'
+        a.percent=a.qty
+        a.rate=a.standard_rate
+        a.subtitle = `Price - ${a.standard_rate}`
+      });
+    }
+    getFormData()
+    },
+    [],
+  )
+  
 
   const getFormData = () => {
     // var myHeaders = new Headers();    
@@ -124,13 +149,13 @@ const CartScreen = ({ item }) => {
   return (
     <View>
       <Text style={[mstyle.content, { paddingLeft:7 }]}>{item.label} </Text>
-      <Text style={[mstyle.content, { paddingLeft:7,fontWeight:'700' }]}>Tatal :- {item?.value.length} Items</Text>
+      <Text style={[mstyle.content, { paddingLeft:7,fontWeight:'700' }]}>Total :- {item?.value.length} Items</Text>
 
-      <Pressable style={{ padding: 10,backgroundColor:Colors.DEFAULT_BLUE, borderRadius: 5, marginHorizontal: 10 }}
+      <Pressable style={{ padding: 10,borderColor:Colors.DEFAULT_BLUE,borderWidth:1, borderRadius: 5, marginHorizontal: 10 }}
         onPress={() => {
           setModalVisible(true)
         }} >
-        <Text style={{ fontSize: 15, color: 'white',fontWeight:'700',textAlign:'center' }}>Get Item List</Text>
+        <Text style={{ fontSize: 12, color: Colors.DEFAULT_BLUE,fontWeight:'700',textAlign:'center' }}>Get Item List</Text>
       </Pressable>
 
 

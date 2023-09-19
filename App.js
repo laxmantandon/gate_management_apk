@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { 
-  NavigationContainer, 
+import { View, ActivityIndicator, Text, Pressable } from 'react-native';
+import {
+  NavigationContainer,
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme
 } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import { 
-  Provider as PaperProvider, 
+import {
+  Provider as PaperProvider,
   DefaultTheme as PaperDefaultTheme,
-  DarkTheme as PaperDarkTheme 
+  DarkTheme as PaperDarkTheme
 } from 'react-native-paper';
 
 import { DrawerContent } from './src/screens/DrawerContent';
@@ -37,8 +37,12 @@ import AddSalesInvoiceScreen from './src/screens/Home Tab/AddSalesInvoiceScreen'
 import NotificationScreen from './src/screens/NotificationScreen';
 import TaskScreen from './src/screens/Home Tab/TaskScreen';
 import TaskDetailsScreen from './src/screens/Home Tab/TaskDetailsScreen';
-import QuatationScreen from './src/screens/Home Tab/QuatationScreen';
-import QuatationDetailsScreen from './src/screens/Home Tab/QuatationDetailsScreen';
+import QrscannerScreeen from './src/screens/QrscannerScreeen';
+import DoctypeFormScreen from './src/screens/Home Tab/DoctypeFormScreen';
+import DoctypeListScreen from './src/screens/Home Tab/DoctypeListScreen';
+import route from './src/screens/route/route';
+import QuotationScreen from './src/screens/Home Tab/QuotationScreen';
+import QuatationDetailsScreen from './src/screens/Home Tab/QuotationDetailsScreen';
 // import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const Drawer = createDrawerNavigator();
@@ -46,6 +50,7 @@ const Drawer = createDrawerNavigator();
 const App = () => {
   // const [isLoading, setIsLoading] = React.useState(true);
   // const [userToken, setUserToken] = React.useState(null); 
+  // AsyncStorage.clear()
 
   const [isDarkTheme, setIsDarkTheme] = React.useState(false);
 
@@ -65,7 +70,7 @@ const App = () => {
       text: '#333333'
     }
   }
-  
+
   const CustomDarkTheme = {
     ...NavigationDarkTheme,
     ...PaperDarkTheme,
@@ -80,28 +85,28 @@ const App = () => {
   const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
 
   const loginReducer = (prevState, action) => {
-    switch( action.type ) {
-      case 'RETRIEVE_TOKEN': 
+    switch (action.type) {
+      case 'RETRIEVE_TOKEN':
         return {
           ...prevState,
           userToken: action.token,
           isLoading: false,
         };
-      case 'LOGIN': 
+      case 'LOGIN':
         return {
           ...prevState,
           userName: action.id,
           userToken: action.token,
           isLoading: false,
         };
-      case 'LOGOUT': 
+      case 'LOGOUT':
         return {
           ...prevState,
           userName: null,
           userToken: null,
           isLoading: false,
         };
-      case 'REGISTER': 
+      case 'REGISTER':
         return {
           ...prevState,
           userName: action.id,
@@ -114,26 +119,26 @@ const App = () => {
   const [loginState, dispatch] = React.useReducer(loginReducer, initialLoginState);
 
   const authContext = React.useMemo(() => ({
-    signIn: async(foundUser) => {
+    signIn: async (foundUser) => {
       // setUserToken('fgkj');
       // setIsLoading(false);
       const userToken = String(foundUser[0].userToken);
       const userName = foundUser[0].username;
-      
+
       try {
         await AsyncStorage.setItem('userToken', userToken);
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       }
       // console.log('user token: ', userToken);
       dispatch({ type: 'LOGIN', id: userName, token: userToken });
     },
-    signOut: async() => {
+    signOut: async () => {
       // setUserToken(null);
       // setIsLoading(false);
       try {
         await AsyncStorage.removeItem('userToken');
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       }
       dispatch({ type: 'LOGOUT' });
@@ -143,18 +148,18 @@ const App = () => {
       // setIsLoading(false);
     },
     toggleTheme: () => {
-      setIsDarkTheme( isDarkTheme => !isDarkTheme );
+      setIsDarkTheme(isDarkTheme => !isDarkTheme);
     }
   }), []);
 
   useEffect(() => {
-    setTimeout(async() => {
+    setTimeout(async () => {
       // setIsLoading(false);
       let userToken;
       userToken = null;
       try {
         userToken = await AsyncStorage.getItem('userToken');
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       }
       // console.log('user token: ', userToken);
@@ -162,10 +167,10 @@ const App = () => {
     }, 1000);
   }, []);
 
-  if( loginState.isLoading ) {
-    return(
-      <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-        <ActivityIndicator size="large"/>
+  if (loginState.isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -174,83 +179,253 @@ const App = () => {
 
   return (
     <PaperProvider theme={theme}>
-    <AuthContext.Provider value={authContext}>
-    <NavigationContainer theme={theme}>
-      { loginState.userToken !== null ? (
-        <stack.Navigator >
-          <stack.Screen name="HomeDrawer" component={MainTabScreen} options={() => ({ headerShown: false })} />
-          <stack.Screen name="Lead" component={LeadScreen} options={({navigation})=>({ title:'Lead', headerRight:()=>{
-          return(
-            <View style={{flexDirection:'row'}}>
-              <View style={{paddingHorizontal:5}}> 
-              <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE} 
-                  onPress={() => {navigation.navigate('AddLead', Item='')}} ></Icon>
-              </View>
+      <AuthContext.Provider value={authContext}>
+        <NavigationContainer theme={theme}>
+          {loginState.userToken !== null ? (
+            <stack.Navigator >
+              <stack.Screen name="HomeDrawer" component={MainTabScreen} options={() => ({ headerShown: false })} />
+              <stack.Screen name="Lead" component={LeadScreen} options={({ navigation }) => ({
+                title: 'Lead',
+                headerTitle:()=>{
+                  return(
+                  <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Lead</Text>
+                  </View>
+                  )
+  
+                  },
+                  
+                  headerRight: () => {
+                  return (
+                    <Pressable  onPress={() => { navigation.navigate('AddLead', Item = '') }} style={{ flexDirection: 'row' }}>
+                      <View style={{ paddingHorizontal: 1 }}>
+                        <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                      </View>
+                      <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Lead</Text>
+
+                    </Pressable>
+                  )
+                }
+
+              })
+              } />
+
+{/* <stack.Screen name="DoctypeForm" component={DoctypeFormScreen} options={{ title: 'All Cart List' }} /> */}
+{/* <stack.Screen name="DoctypeList" component={DoctypeListScreen} options={{ title: 'All Cart List' }} /> */}
+<stack.Screen name="QrscannerScreeen" component={QrscannerScreeen} options={{ title: 'All Cart List' }} />
+
+              <stack.Screen name="AddLead" component={AddLeadScreen} options={({ navigation, route: {
+                params: { item },
+              }
+              }) => ({
+                headerTitle:()=>{
+                return(<View>
+                    {item?(<View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Lead</Text>
+                      <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
+                    </View>):(
+                    <View>
+                    <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Lead</Text>
+                  </View>)}
+
+                  </View>
+                )
+
+                },
+                headerRight: () => {
+                  return (
+                    <View>
+                      {item?(
+                        <Pressable 
+                        onPress={() => { 
+                          // navigation.navigate('QrscannerScreeen', Item = {item})
+                          navigation.navigate('AddOpportunityScreen', Item = {item})
+                      
+                      }}
+                         style={{ flexDirection: 'row' }}>
+                          <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                            <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                            <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Opportunity</Text>
+                          </View>
+                        </Pressable>
+                      ):''}
+                    </View>
+                  )
+                },
+              })} />
+
+              <stack.Screen name="OpportunityScreen" component={OpportunityScreen} options={({ navigation }) => ({
+                // title: 'Opportunity', 
+                 headerTitle:()=>{
+                  return(
+                  <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Opportunity</Text>
+                  </View>
+                  )
+  
+                  },
+                
+                headerRight: () => {
+                  return (
+                     <Pressable  onPress={() => { navigation.navigate('AddOpportunityScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <View style={{ paddingHorizontal: 1 }}>
+                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
+                     </View>
+                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Opportunity</Text>
+                   </Pressable>
+                  )
+                }
+
+              })
+              } />
+
               
-            </View>
-          ) 
+
+              <stack.Screen name="AddOpportunityScreen" component={AddOpportunityScreen} options={({ navigation, route: {
+                params: { item },
+              }
+              }) => ({
+                title: 'Details Opportunity', 
+             
+                headerTitle:()=>{
+                  return(<View>
+                      {item?(<View>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Opportunity</Text>
+                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
+                      </View>):(
+                      <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Opportunity</Text>
+                    </View>)}
+  
+                    </View>
+                  )
+  
+                  },
+                  headerRight: () => {
+                    return (
+                      <View>
+                        {item?(
+                          <Pressable 
+                          onPress={() => { 
+                            navigation.navigate('QrscannerScreeen', Item = {item}) 
+                            // navigation.navigate('QuatationDetailsScreen', Item = {item}) 
+                          }}
+                           style={{ flexDirection: 'row' }}>
+                            <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Quotation</Text>
+                            </View>
+                          </Pressable>
+                        ):''}
+                      </View>
+                    )
+                  },
+              })
+              } /> 
+
+              <stack.Screen name="SalesInvoiceScreen" component={SalesInvoiceScreen} options={({ navigation }) => ({
+                title: 'Sales Order', headerRight: () => {
+                  return (
+                    <View style={{ flexDirection: 'row' }}>
+                      <View style={{ paddingHorizontal: 5 }}>
+                        <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE}
+                          onPress={() => { navigation.navigate('AddSalesInvoiceScreen', Item = '') }} ></Icon>
+                      </View>
+
+                    </View>
+                  )
+                }
+
+              })
+              } />
+
+              <stack.Screen name="AddSalesInvoiceScreen" component={AddSalesInvoiceScreen} options={{ title: 'Sales Order Details' }} />
+
+
+
+
+              <stack.Screen name="TaskScreen" component={TaskScreen} />
+              <stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
+
+
+              <stack.Screen name="QuatationScreen" component={QuotationScreen} options={({ navigation }) => ({
+                // title: 'Opportunity', 
+                 headerTitle:()=>{
+                  return(
+                  <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Quatation</Text>
+                  </View>
+                  )
+  
+                  },
+                
+                headerRight: () => {
+                  return (
+                     <Pressable  onPress={() => { navigation.navigate('QuatationDetailsScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <View style={{ paddingHorizontal: 1 }}>
+                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
+                     </View>
+                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Quatation</Text>
+                   </Pressable>
+                  )
+                }
+
+              })
+              } />
+              <stack.Screen name="QuatationDetailsScreen" component={QuatationDetailsScreen} options={({ navigation, route: {
+                params: { item },
+              }
+              }) => ({
+                title: 'Details Quatation', 
+             
+                headerTitle:()=>{
+                  return(<View>
+                      {item?(<View>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Quatation</Text>
+                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
+                      </View>):(
+                      <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Quatation</Text>
+                    </View>)}
+  
+                    </View>
+                  )
+  
+                  },
+                  headerRight: () => {
+                    return (
+                      <View>
+                        {item?(
+                          <Pressable 
+                          onPress={() => { 
+                            // navigation.navigate('QrscannerScreeen', Item = {item}) 
+                        }}
+                           style={{ flexDirection: 'row' }}>
+                            <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Sales order</Text>
+                            </View>
+                          </Pressable>
+                        ):''}
+                      </View>
+                    )
+                  },
+              })
+              } />
+
+
+
+              <stack.Screen name="SupportScreen" component={SupportScreen} />
+              <stack.Screen name="NotificationScreen" component={NotificationScreen} />
+              <stack.Screen name="SettingsScreen" component={SettingsScreen} />
+              <stack.Screen name="BookmarkScreen" component={BookmarkScreen} />
+            </stack.Navigator>
+          )
+            :
+            <RootStackScreen />
           }
-        
-        })
-        } />
-          <stack.Screen name="AddLead" component={AddLeadScreen} options={{ title:'Add New Lead' }} />
-
-          <stack.Screen name="OpportunityScreen" component={OpportunityScreen} options={({navigation})=>({ title:'Opportunity', headerRight:()=>{
-          return(
-            <View style={{flexDirection:'row'}}>
-              <View style={{paddingHorizontal:5}}> 
-              <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE} 
-                  onPress={() => {navigation.navigate('AddOpportunityScreen', Item='')}} ></Icon>
-              </View>
-              
-            </View>
-          ) 
-          }
-        
-        })
-        } />
-
-<stack.Screen name="AddOpportunityScreen" component={AddOpportunityScreen} options={{ title:'Add New Opportunity' }} />
-<stack.Screen name="SalesInvoiceScreen" component={SalesInvoiceScreen} options={({navigation})=>({ title:'Sales Invoice', headerRight:()=>{
-          return(
-            <View style={{flexDirection:'row'}}>
-              <View style={{paddingHorizontal:5}}> 
-              <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE} 
-                  onPress={() => {navigation.navigate('AddSalesInvoiceScreen', Item='')}} ></Icon>
-              </View>
-              
-            </View>
-          ) 
-          }
-        
-        })
-        } />
-
-<stack.Screen name="AddSalesInvoiceScreen" component={AddSalesInvoiceScreen} options={{ title:'Sales Invoice Details' }} />
-
-
-
-
-<stack.Screen name="TaskScreen" component={TaskScreen} />
-<stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
-
-
-<stack.Screen name="QuatationScreen" component={QuatationScreen} />
-<stack.Screen name="QuatationDetailsScreen" component={QuatationDetailsScreen} />
-
-
-
-<stack.Screen name="SupportScreen" component={SupportScreen} />
-          <stack.Screen name="NotificationScreen" component={NotificationScreen} />
-          <stack.Screen name="SettingsScreen" component={SettingsScreen} />
-          <stack.Screen name="BookmarkScreen" component={BookmarkScreen} />
-        </stack.Navigator>
-      )
-    :
-      <RootStackScreen/>
-    }
-    </NavigationContainer>
-    </AuthContext.Provider>
+        </NavigationContainer>
+      </AuthContext.Provider>
     </PaperProvider>
   );
 }

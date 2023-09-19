@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Alert, Modal, FlatList, ToastAndroid, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Pressable, Alert, Modal, FlatList, ToastAndroid, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Card from './Card';
 import { Colors } from '../contants';
@@ -6,6 +6,7 @@ import mstyle from './mstyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
+import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 
 
 const ProductsScreen = ({ item,cart_productsList }) => {
@@ -15,11 +16,15 @@ const ProductsScreen = ({ item,cart_productsList }) => {
     const [cartList, setcartList] = useState([])
     const [OpenScanner, setOpenScanner] = useState(false)
     const [searchText, setsearchText] = useState('')
+    const [scannedProduct, setscannedProduct] = useState([])
+    const [ViewscannedProduct, setViewscannedProduct] = useState(false)
+    const [similarProducts, setsimilarProducts] = useState([])
 
 useEffect(() => {
   searchFilterFunction('')
+  console.log(item.value)
     if(item?.value){
-      setcartList(item?.value)
+      setcartList(item.value)
     }
 }, [])
 
@@ -39,17 +44,20 @@ useEffect(() => {
             mapped_array = []
             v.data.forEach(a => {
                 // console.log(a)
-                if (cartList){
-                  cartList.forEach(c => {
-                    if (c.item_code==a.item_code){
-                      a.percent=c.percent
-                      a.qty=c.qty
-    
+                let p ={"image":`https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+                "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name, "qty": 0, 
+                "status": 'Add to Cart', "percent": 0, "item_code": a.name ,'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp }
+
+                if (item.value){
+                  item.value.forEach(c => {
+                    if (c.item_code==p.item_code){
+                      p.percent=c.percent
+                      p.qty=c.qty
                     }
                   });
                 }
 
-                mapped_array.push({"image":`https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.standard_rate}`,"rate": a.standard_rate, "title": a.item_name, "description": a.description, "item_name": a.item_name, "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name })
+                mapped_array.push(p)
             })
             setproductsList(mapped_array)
 
@@ -60,7 +68,7 @@ useEffect(() => {
 
     const SearchProductData=(e)=>{
       setOpenScanner(false)
-      let text=e.data
+      let text=e
       var myHeaders = new Headers();    
       var requestOptions = {
         method: 'GET',
@@ -72,8 +80,11 @@ useEffect(() => {
         .then(response => response.text())
         .then(result =>{ 
           let v= JSON.parse(result)
-          // console.log(v)
+          console.log('my result',v)
           mapped_array = []
+          setViewscannedProduct(true)
+
+          SimillerProducts(v.data[0].item_name)
           v.data.forEach(a => {
               // console.log(a)
               if (cartList){
@@ -86,11 +97,46 @@ useEffect(() => {
                 });
               }
 
-              mapped_array.push({"image":`https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.standard_rate}`,"rate": a.standard_rate, "title": a.item_name, "description": a.description, "item_name": a.item_name, "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name })
-          })
-          setproductsList(mapped_array)
+              mapped_array = {
+                "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+                "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
+                "qty": a.qty?a.qty:0, "status": 'Add to Cart', "percent": a.qty?a.qty:0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
+              }
+            })
+            setscannedProduct(mapped_array)
 
           
+      })
+  }
+
+
+  const SimillerProducts = (item_cate) => {
+    // setOpenScanner(true)
+    // let text=e.data
+    var myHeaders = new Headers();
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    fetch(`https://dbh.erevive.cloud/api/resource/Item?fields=["*"]`, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        let v = JSON.parse(result)
+        console.log(v)
+        let mapped_array = []
+        v.data.forEach(a => {
+          mapped_array.push({
+            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
+            "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
+          })
+        })
+        setsimilarProducts(mapped_array)
+        // console.log('similler',similarProducts)
+
+
       })
   }
 
@@ -181,13 +227,21 @@ useEffect(() => {
 
     return (
         <View>
-            {/* <Text>ProductsScreen</Text> */}
-            <Pressable style={{ backgroundColor: Colors.DEFAULT_BLUE, padding: 15, margin: 8, borderRadius: 5 }}
+          
+            <View>
+              <Pressable style={{ backgroundColor: Colors.DEFAULT_BLUE, padding: 15, margin: 8, borderRadius: 5 }}
                 onPress={() => {
                     setModalVisible(true)
                 }} >
                 <Text style={{ fontSize: 15, color: 'white',textAlign:'center',fontWeight:'bold' }}>Add New Item</Text>
             </Pressable>
+
+
+
+
+
+
+
             <Modal visible={modalVisible}
                 animationType="slide"
                 transparent={true}
@@ -199,7 +253,7 @@ useEffect(() => {
 
            {OpenScanner?(
             <QRCodeScanner
-            onRead={(e)=>{ SearchProductData(e) }}
+            onRead={(e)=>{ SearchProductData(e.data) }}
             reactivate={true}
             showMarker={true}
             flashMode={RNCamera.Constants.FlashMode.auto}
@@ -237,7 +291,52 @@ useEffect(() => {
              <View>
              <Text style={{ fontSize: 18, color: 'black', fontWeight: '700', textAlign: 'center' }}>Get Product List</Text>
 
-             <View style={{ flexDirection: 'row' }}>
+             <View>
+             {ViewscannedProduct?(
+            <ScrollView style={{paddingHorizontal:10}}>
+            {/* <Text>{OpenScanner}</Text> */}
+            <ProductDetailsScreen item={scannedProduct} />
+            <View style={{ paddingVertical: 10 }}>
+              <Text style={{ fontSize: 12, color: 'black', fontWeight: 'bold' }}>
+                Similar Products
+              </Text>
+              <FlatList
+                horizontal={true}
+                data={similarProducts}
+                renderItem={({ item }) => {
+                  return (
+                    <Pressable onPress={()=>{SearchProductData(item?.item_code)  }} style={{ width: 100, marginRight: 8 }}>
+                      <View>
+                        <Image source={{ uri: item?.image }} style={{ width: 'auto', height: 100, borderRadius: 10 }} />
+                        <Text numberOfLines={1} style={{ fontSize: 12, color: 'black', fontWeight: '500' }}>{item?.title}</Text>
+                        <Text numberOfLines={1} style={{ fontSize: 12, color: 'black' }}>MRP:- Rs. {item?.mrp}</Text>
+                      </View>
+                    </Pressable>
+                  )
+                }}
+  
+              />
+            </View>
+  
+            <Pressable style={{ backgroundColor: 'gold', padding: 10, marginBottom: 10 }} onPress={() => {
+              addProductTocart(scannedProduct)
+              // console.log(ScannedProduct)
+            }}>
+              <Text style={{ color: 'white', fontWeight: '700' }}>Add To Cart</Text>
+            </Pressable>
+  
+            <Pressable style={{ backgroundColor: 'blue', padding: 10 }} onPress={() => { setOpenScanner(false) }}>
+              <View style={{flexDirection:"row"}}>
+                <Icon name={'qr-code-outline'}  size={25}/>
+                <Text style={{ color: 'white', fontWeight: '700' }}>Scan QR</Text>
+
+              </View>
+            </Pressable>
+  
+          </ScrollView>
+          ):(
+            <View>
+              <View style={{ flexDirection: 'row' }}>
                <View style={[mstyle.inputContainer, { marginTop: 10, width: '83%', elevation: 2 }]}>
                  <View style={mstyle.inputSubContainer}>
                    <TextInput
@@ -254,10 +353,10 @@ useEffect(() => {
 
                <Pressable onPress={() => { setOpenScanner(true) }}
                  style={{
-                   marginTop: 10, marginRight: 15, marginLeft: 'auto', backgroundColor: Colors.DEFAULT_BLUE, justifyContent: 'center',
+                   marginTop: 10, marginRight: 10, marginLeft: 'auto', backgroundColor: Colors.DEFAULT_BLUE, justifyContent: 'center',
                    borderColor: 'gray', borderWidth: .5, borderRadius: 5, paddingHorizontal: 5
                  }}>
-                 <Icon name="filter" size={25} color={"white"} />
+                 <Icon name="scan-circle-outline" size={30} color={"white"} />
                </Pressable>
              </View>
 
@@ -280,7 +379,6 @@ useEffect(() => {
                  )
                }}
              />
-
              <Pressable
                onPressIn={() => {
                  // item?.value = cartList
@@ -291,6 +389,12 @@ useEffect(() => {
                  Go To Cart
                </Text>
              </Pressable>
+              </View>
+
+          )}
+              </View>
+
+             
 
 
            </View>
@@ -300,6 +404,13 @@ useEffect(() => {
 
                 </View>
             </Modal>
+
+
+            </View>
+          
+            {/* <Text>ProductsScreen</Text> */}
+            
+
         </View>
     )
 }

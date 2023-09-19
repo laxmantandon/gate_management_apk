@@ -10,7 +10,7 @@ import Frappe_Model from '../Frappe_Model'
 import frappe from '../../services/frappe'
 
 
-const OpportunityScreen = ({ navigation }) => {
+const QuotationScreen = ({ navigation }) => {
   const [ListData, setListData] = useState([])
   const [ScreensData, setScreensData] = useState([])
   const [responseData, setresponseData] = useState([])
@@ -36,7 +36,7 @@ const OpportunityScreen = ({ navigation }) => {
   const getData = () => {
     
     setloading(true)
-    frappe.get_list('Opportunity',filters={'modified_by':'kamesh@erevive.in'}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Quotation',filters={'modified_by':'kamesh@erevive.in'}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
@@ -45,7 +45,7 @@ const OpportunityScreen = ({ navigation }) => {
       setresponseData(m?.data)
       resp.data.forEach(a => {
         // console.log(a)
-        mapped_array.push({data:a, doctype:'Opportunity', title: a.name, subtitle: `${a.customer_name}`, 
+        mapped_array.push({data:a, doctype:'Quotation', title: a.name, subtitle: `${a.customer_name}`, 
         date: a.modified, whatsapp: a.whatsapp_no?a.whatsapp:a.contact_mobile, call: a.contact_mobile })
       });
       setListData(mapped_array)
@@ -65,7 +65,7 @@ const OpportunityScreen = ({ navigation }) => {
 
   const searchFilterFunction = (text) => {
     setloading(true)
-    frappe.get_list('Opportunity',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Quotation',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
@@ -74,7 +74,7 @@ const OpportunityScreen = ({ navigation }) => {
       setresponseData(m?.data)
       resp.data.forEach(a => {
         // console.log(a)
-        mapped_array.push({data:a, doctype:'Opportunity', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
+        mapped_array.push({data:a, doctype:'Quotation', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
         date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
       });
       setListData(mapped_array)
@@ -128,7 +128,7 @@ const OpportunityScreen = ({ navigation }) => {
           renderItem={(item) => {
             return (
               <Pressable onPress={() => { 
-                navigation.navigate('AddOpportunityScreen',item=item)
+                navigation.navigate('QuatationDetailsScreen',item=item)
                  }}>
                 <Card item={item} />
               </Pressable>
@@ -154,7 +154,7 @@ const OpportunityScreen = ({ navigation }) => {
           }}
         />
       </ScrollView>
-      {/* <Pressable onPress={() => { navigation.navigate('AddOpportunity') }} >
+      {/* <Pressable onPress={() => { navigation.navigate('AddQuotation') }} >
         <FabButton />
 
       </Pressable> */}
@@ -162,4 +162,4 @@ const OpportunityScreen = ({ navigation }) => {
   )
 }
 
-export default OpportunityScreen
+export default QuotationScreen

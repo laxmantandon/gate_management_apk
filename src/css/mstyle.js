@@ -1,11 +1,11 @@
 import { StyleSheet } from "react-native";
-import { Colors, Fonts } from '../contants';
+import { Colors, Fonts } from "./contants";
 import { Display } from "./utils";
 
 
 export default mstyle = StyleSheet.create({
   container: {
-      paddingTop:15,
+      paddingTop:10,
       flex: 1,
       backgroundColor: '#f0f8fe',
     },
@@ -17,14 +17,14 @@ export default mstyle = StyleSheet.create({
       headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 5,
+        paddingVertical: 10,
         paddingHorizontal: 20,
       },
       headerTitle: {
         fontSize: 20,
-        // fontFamily: Fonts.POPPINS_MEDIUM,
+        fontFamily: Fonts.POPPINS_MEDIUM,
         lineHeight: 20 * 1.4,
-        width: 80,
+        width: Display.setWidth(80),
         textAlign: 'center',
       },
       title: {
@@ -33,7 +33,7 @@ export default mstyle = StyleSheet.create({
         fontSize: 16,
         borderBottomColor:'silver',
         borderBottomWidth:1,
-        // fontFamily: Fonts.POPPINS_MEDIUM,
+        fontFamily: Fonts.POPPINS_MEDIUM,
         fontWeight: "bold",
         lineHeight: 16 * 1.4,
         marginTop: 20,
@@ -43,10 +43,9 @@ export default mstyle = StyleSheet.create({
       },
     content: {
     textAlign: "left",
-    fontSize: 12,
-    fontWeight:'500',
-    // fontWeight:'semibold',
-    // fontFamily: Fonts.POPPINS_MEDIUM,
+    fontSize: 14,
+    fontWeight:'semibold',
+    fontFamily: Fonts.POPPINS_MEDIUM,
     color:'black',
     // marginTop: 7,
     marginBottom: 3,
@@ -64,13 +63,13 @@ export default mstyle = StyleSheet.create({
   inputContainer1: {
     backgroundColor: Colors.DEFAULT_WHITE,
     paddingHorizontal: 7,
-    // marginHorizontal: 10,
+    marginHorizontal: 10,
     borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'gray',
-    // padding:10,
+    padding:10,
     justifyContent: 'center',
-    // elevation:8
+    elevation:8
   },
 
   inputContainer2: {
@@ -89,9 +88,9 @@ export default mstyle = StyleSheet.create({
     alignItems: 'center',
   },
   inputText: {
-    fontSize: 12,
+    fontSize: 14,
     textAlignVertical: 'center',
-    paddingVertical:5,
+    paddingVertical:10,
     width:'100%',
     // height: Display.setHeight(6),
     color: Colors.DEFAULT_BLACK,
@@ -101,16 +100,16 @@ export default mstyle = StyleSheet.create({
     backgroundColor: Colors.DARK_ONE,
     borderRadius: 8,
     marginHorizontal: 20,
-    height: 6,
+    height: Display.setHeight(6),
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
   },
   PrimaryButtonText: {
-    fontSize: 12,
+    fontSize: 14,
     lineHeight: 15 * 1.4,
     color: Colors.DEFAULT_WHITE,
-    // fontFamily: Fonts.POPPINS_MEDIUM,
+    fontFamily: Fonts.POPPINS_MEDIUM,
   },
 
   //For cards
@@ -121,7 +120,7 @@ export default mstyle = StyleSheet.create({
     borderBottomColor: Colors.SECONDARY_WHITE,
     borderBottomWidth:1,
     paddingHorizontal: 7,
-    paddingVertical:5,
+    paddingVertical:7,
     borderRadius: 4,
     flexDirection: 'row',
     marginHorizontal: 7,
@@ -141,8 +140,8 @@ export default mstyle = StyleSheet.create({
 
   listListTitle: {
     color: 'black',
-    // fontFamily: Fonts.POPPINS_MEDIUM,
-    fontSize: 12,
+    fontFamily: Fonts.POPPINS_MEDIUM,
+    fontSize: 14,
     fontWeight: 'bold',
     letterSpacing: 0.1,
     // width: '100%',

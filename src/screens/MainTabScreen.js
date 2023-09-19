@@ -5,7 +5,6 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import Icon from 'react-native-vector-icons/Ionicons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import DetailsScreen from './DetailsScreen';
 import ExploreScreen from './ExploreScreen';
 import ProfileScreen from './ProfileScreen';
 import HomeScreen from './tab screens/HomeScreen';
@@ -13,9 +12,10 @@ import LeadScreen from './Home Tab/LeadScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import { Colors } from '../contants';
+import CalenderScreen from './CalenderScreen';
 
 const HomeStack = createNativeStackNavigator();
-const DetailsStack = createNativeStackNavigator();
+const CalenderStack = createNativeStackNavigator();
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -44,15 +44,15 @@ const MainTabScreen = ({ navigation }) => (
       }}
     />
     <Tab.Screen
-      name="Notificationstab"
-      component={DetailsStackScreen}
+      name="Calendertab"
+      component={CalenderStackScreen}
       options={{
-        tabBarLabel: 'Updates',
+        tabBarLabel: 'Calender',
         tabBarColor: '#1f65ff',
         tabBarIcon: ({ focused, color }) => {
           return (
             <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <Icon name={focused ? "notifications" : "notifications-outline"} color={focused ? color : "#111"} size={20} />
+              <Icon name={focused ? "calendar-number" : "calendar-number-outline"} color={focused ? color : "#111"} size={20} />
             </View>
           )
         },
@@ -135,8 +135,8 @@ const HomeStackScreen = ({ navigation }) => (
   </HomeStack.Navigator>
 );
 
-const DetailsStackScreen = ({ navigation }) => (
-  <DetailsStack.Navigator screenOptions={{
+const CalenderStackScreen = ({ navigation }) => (
+  <CalenderStack.Navigator screenOptions={{
     headerStyle: {
       backgroundColor: '#1f65ff',
     },
@@ -145,10 +145,9 @@ const DetailsStackScreen = ({ navigation }) => (
       fontWeight: 'bold'
     }
   }}>
-    <DetailsStack.Screen name="Details" component={DetailsScreen} options={{
-      headerLeft: () => (
-        <Icon.Button name="ios-menu" size={25} backgroundColor="#1f65ff" onPress={() => navigation.openDrawer()}></Icon.Button>
-      )
+    <CalenderStack.Screen name="CalenderScreen" component={CalenderScreen} options={{
+      headerShown:false,
+     
     }} />
-  </DetailsStack.Navigator>
+  </CalenderStack.Navigator>
 );

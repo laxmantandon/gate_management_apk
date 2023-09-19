@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button, Pressable, Image, TouchableOpacity, FlatList } from 'react-native'
+import { View, Text, TextInput, Button, Pressable, Image, TouchableOpacity, FlatList, ScrollView, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Colors } from '../contants'
 import CameraPermission from '../services/permissionservices'
@@ -13,6 +13,10 @@ import moment from 'moment'
 import mystyles from '../css/mystyles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DatePicker from 'react-native-date-picker'
+import mstyle from './mstyle'
+import SearchableDropDown from 'react-native-searchable-dropdown'
+import frappe from '../services/frappe'
+
 
 
 
@@ -28,6 +32,7 @@ const MYinputs = ({ item }) => {
   useEffect(() => {
     if(item?.link_doctype){
       getLinkedDoctype('a')
+      // getfiltersdata()
     }
 
   }, [])
@@ -125,30 +130,27 @@ const [multi_value, setmulti_value] = useState([])
   }
 const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
   const getLinkedDoctype = (text) => {
-    var myHeaders = new Headers();
-    var requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'
-    };
-    fetch(`https://dbh.erevive.cloud/api/resource/${item?.link_doctype}?fields=["name"]`, requestOptions)
-      .then(response => response.text())
-      .then(result => {
-        // console.log(result)
+if(item.options.length >0){
+
+}else{
+
+    
+    frappe.get_list(item.link_doctype,filters=[[item.link_doctype,"name","like",`%${text}%` ]], fields=["name"]).then(result => {
+        // console.log('select search data', result)
         // item.options=[]
-        let mdata = JSON.parse(result)
+        let mdata = result
         mapped_data=[]
         mdata.data.forEach(a => {
-          // console.log(a.name)
-          if (item?.options.includes(a.name)) {
-          } else {
+          let mapped=[]
+          
             if (a.name){
-              mapped_data.push(a)
+              mapped_data=a
               setLinkedDoctypeData(mapped_data)
-              item?.options.push(a.name)
+              mapped.push(a.name)
             }
-          }
+            item.options = mapped
 
+            console.log(item.options)
 
         });
 
@@ -166,14 +168,85 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
 
       })
       .catch(error => console.log('error', error));
+
+    }
   }
   // const [read_only, setread_only] = useState(item?.read_only?'none':'auto')
   const [read_only, setread_only] = useState(item?.read_only?'auto':'auto')
 
+  const refreshGetData=()=>{
+    
+    setloading(true)
+    setTimeout(() => {
+      setloading(false)
+    }, 1000);
+
+  }
+
+  const getfiltersdata=(text)=>{
+    let req={}
+    if(item.key=='opportunity_from'){
+        req = {
+        txt: text,
+        doctype: item.link_doctype,
+        ignore_user_permissions: 0,
+        reference_doctype: item.data.parent,
+        filters: { "name": ["in", ["Customer", "Lead", "Prospect"]] }
+        }
+        console.log(req)
+
+        frappe.search_links(req).then((result)=>{
+          console.log(result)
+          mapped=[]
+          result.results.forEach(a => {
+            mapped.push({'name':a.value,'id':a.value})
+          });
+          item.options=mapped
+          console.log(item.options)
+          
+        })
+    }else{
+      req = {
+        txt: text,
+        doctype: item.link_doctype,
+        ignore_user_permissions: 0,
+        reference_doctype: item.data.parent,
+      }
+      console.log(req)
+
+      // frappe.search_links(req).then((result)=>{
+      frappe.get_list(item.link_doctype,filters={"name":["like",`%${text}%` ]}, fields=["name"]).then(result => {
+
+        console.log(result)
+        mapped=[]
+        result.results.forEach(a => {
+          mapped.push({'name':a.value,'id':a.value})
+        });
+        item.options=mapped
+        console.log(item.options)
+      })
+    }  
+    // onRefresh  
+  }
+
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
   return (
-    <View pointerEvents={read_only} style={{overflow:'grey'}}>
+    <ScrollView
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    }
+     pointerEvents={read_only} style={{overflow:'grey',marginBottom:1}}>
       <View style={[mystyles.inputContainer1, {
-        backgroundColor: 'white', marginTop: 8
+        backgroundColor: 'white', marginTop: 8,marginBottom:1
 
       }]}>
         {item?.type === 'multi_checkbox' ? (
@@ -342,26 +415,27 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                               data={item?.options}
                               onChangeSearchInputText={(text)=>{
                                 // console.log(text)
-                                      if(item?.link_doctype){
+                                      if(item.link_doctype){
                                         getLinkedDoctype(text)
                                       }
                               }}
                               defaultValue={item.value}
+                              defaultValueByIndex={0}
                               defaultButtonText={item?.label}
                               buttonStyle={{
                                 backgroundColor: 'white',
-                                width: '100%', height: 50
+                                width: '100%', height: 36
                               }}
-                              buttonTextStyle={{ fontSize: 14, }}
+                              buttonTextStyle={{ fontSize: 12, }}
                             
                               renderDropdownIcon={isOpened => {
-                                return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={18} />;
+                                return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={15} />;
                               }}
 
                               dropdownIconPosition={'right'}
                               dropdownStyle={[mstyle.inputContainer]}
                               selectedRowStyle={{ backgroundColor: Colors.LIGHT_BLUE,borderColor:Colors.LIGHT_BLUE }}
-                              rowTextStyle={{ fontSize: 14,fontWeight:'600' }}
+                              rowTextStyle={{ fontSize: 12,fontWeight:'600' }}
                               rowStyle={{backgroundColor:Colors.SECONDARY_WHITE,borderColor:'silver'}}
 
                               onSelect={(selectedItem, index) => {
@@ -369,12 +443,12 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                 item.value = selectedItem
                                 item.index = index
 
-                                LinkedDoctypeData.forEach(a => {
-                                  if(a.name==selectedItem){
-                                    item.fetch=  a
-                                  }
+                                // LinkedDoctypeData.forEach(a => {
+                                //   if(a.name==selectedItem){
+                                //     item.fetch=  a
+                                //   }
                                   
-                                });
+                                // });
 
                               }}
                               buttonTextAfterSelection={(selectedItem, index) => {
@@ -409,66 +483,132 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                   /> */}
                           </View>
                         ) : (
+                          <View style={{flex:1}}>
+                            { item?.type === 'searchable'?(
+                              <View style={{marginBottom:1}}>
+                              {item.value ? (
+                                <View style={{
+                                  padding: 6, marginTop: 2, flexDirection: 'row',
+                                  backgroundColor: 'white', borderColor: 'silver',
+                                  borderWidth: 0, borderRadius: 5, width: '100%'
+                                }}>
 
-                          <View style={{ flex: 1, flexDirection: 'row' }}>
-                            {item?.type === 'date' || item?.type === 'time' ? (
+                                  <Text style={{ color: 'black', width: '90%', fontSize: 15, fontWeight: 'bold' }}> 
+                                  {item.value}</Text>
+                                  <Icon onPress={() => {
+                                    item.value = ''
+                                    item.data = {}
+                                    setloading(true)
+                                    refreshGetData()
+
+                                  }} name='close-circle-outline' size={25} style={{ color: 'red' }}></Icon>
+
+                                </View>
+                              ) : (
+
+                                <SearchableDropDown zIndex={999}
+                                  onItemSelect={(kitem) => {
+                                    // alert('select dealer')
+                                    // console.log('clicked',kitem)
+                                    item.value = kitem.id
+                                    item.data = kitem
+                                    console.log('clicked', item.data)
+                                    setloading(true)
+                                    refreshGetData()
+
+
+                                  }}
+
+                                  containerStyle={{ padding: 3, width: '100%' }}
+                                  onRemoveItem={(item, index) => {
+                                    // const items = selectedCrops.filter((sitem) => sitem.name !== item.name);
+                                    // setselectedDelers(items)
+                                  }}
+                                  itemStyle={{
+                                    padding: 10,
+                                    marginTop: 2,
+                                    backgroundColor: 'white',
+                                    borderColor: 'silver',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                  }}
+                                  itemTextStyle={{ color: '#222' }}
+                                  itemsContainerStyle={{ maxHeight: 140 }}
+                                  items={item.options?item.options:[]}
+                                  // defaultIndex={2}
+                                  resetValue={false}
+                                  textInputProps={
+                                    {
+                                      placeholder: item.label,
+                                      underlineColorAndroid: "transparent",
+                                      style: {
+                                        // padding: 8,
+                                        borderWidth: .3,
+                                        borderColor: '#ccc',
+                                        borderRadius: 5,
+                                        color: "black"
+                                      },
+                                      onTextChange: text => {
+                                        getfiltersdata(text)
+
+                                      }
+                                    }
+                                  }
+                                  listProps={
+                                    {
+                                      nestedScrollEnabled: true,
+                                    }
+                                  }
+                                />
+                              )}
+
+                            </View>
+                            ):(
                               <View style={{ flex: 1, flexDirection: 'row' }}>
-                                {/* <Button title="Open" onPress={() => setOpen(true)} style={mstyle.PrimaryButton} /> */}
-                                <DatePicker
-                                  mode={item?.type == 'date' ? 'date' : 'time'}
-                                  modal
-                                  open={open}
-                                  date={item?.value? moment(item?.value).toDate() :moment().toDate()}
-                                  onConfirm={text => {
-                                    item.value =  moment(new Date(text)).format('YY-MM-DD')
-                                    console.log(item.value)
-                                    setOpen(false)
-                                  }}
-                                  onCancel={() => {
-                                    setOpen(false)
-                                  }}
-                                />
-
-                                <Icon
-                                  onPress={() => setOpen(true)}
-                                  name={item?.type == 'date' ? "calendar-outline" : "alarm-outline"}
-                                  size={32}
-                                  color={Colors.DEFAULT_BLUE}
-                                  style={{ paddingVertical: 8, paddingRight: 8 }}
-                                />
-
-                                {item?.type == 'time' ? (
-                                  <Text onPress={() => setOpen(true)}
-                                    style={mstyle.inputText}>{moment(item.value).format('hh:mm a')}</Text>
-                                ) : (
-                                  <Text onPress={() => setOpen(true)}
-                                    style={mstyle.inputText}>{moment(item.value).format('Do MMM-YYYY')}</Text>
-                                )}
-
-                              </View>
-                            ) : (
-                              // <View>
-                              item?.len ? (<TextInput
-                                placeholder={`${item.placeholder}                                                         `}
-                                keyboardType={item?.keyboard ? item?.keyboard : ''}
-                                placeholderTextColor={'gray'}
-                                selectionColor={Colors.DEFAULT_GREY}
-                                style={mstyle.inputText}
-                                maxLength={item?.len}
-                                multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
-                                onChangeText={text => {
-                                  item.value = text
-                                  // // console.log(item)
-                                }}
-                                // value={item?.value}
-                                defaultValue={item?.value}
-                              />) : (
-                                <TextInput
+                              {item?.type === 'date' || item?.type === 'time' ? (
+                                <View style={{ flex: 1, flexDirection: 'row' }}>
+                                  {/* <Button title="Open" onPress={() => setOpen(true)} style={mstyle.PrimaryButton} /> */}
+                                  <DatePicker
+                                    mode={item?.type == 'date' ? 'date' : 'time'}
+                                    modal
+                                    open={open}
+                                    date={item?.value? moment(item?.value).toDate() :moment().toDate()}
+                                    onConfirm={text => {
+                                      item.value =  moment(new Date(text)).format('YY-MM-DD')
+                                      console.log(item.value)
+                                      setOpen(false)
+                                    }}
+                                    onCancel={() => {
+                                      setOpen(false)
+                                    }}
+                                  />
+  
+                                  <Icon
+                                    onPress={() => setOpen(true)}
+                                    name={item?.type == 'date' ? "calendar-outline" : "alarm-outline"}
+                                    size={22}
+                                    color={Colors.DEFAULT_BLUE}
+                                    style={{ paddingVertical: 8, paddingRight: 8 }}
+                                  />
+  
+                                  {item?.type == 'time' ? (
+                                    <Text onPress={() => setOpen(true)}
+                                      style={mstyle.inputText}>{moment(item.value).format('hh:mm a')}</Text>
+                                  ) : (
+                                    <Text onPress={() => setOpen(true)}
+                                      style={mstyle.inputText}>{moment(item.value).format('Do MMM-YYYY')}</Text>
+                                  )}
+  
+                                </View>
+                              ) : (
+                                // <View>
+                                item?.len ? (<TextInput
                                   placeholder={`${item.placeholder}                                                         `}
-                                  keyboardType={item?.keyboard ? item?.keyboard : ''}
+                                  keyboardType={item?.keyboard ? item?.keyboard :'default'}
                                   placeholderTextColor={'gray'}
                                   selectionColor={Colors.DEFAULT_GREY}
                                   style={mstyle.inputText}
+                                  maxLength={item?.len}
                                   multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
                                   onChangeText={text => {
                                     item.value = text
@@ -476,16 +616,35 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                   }}
                                   // value={item?.value}
                                   defaultValue={item?.value}
-                                  activeUnderlineColor={Colors.DEFAULT_BLUE}
-                                  focusable={true}
-                                />
-                              )
-
-
-                              // </View>
-                            )}
+                                />) : (
+                                  <TextInput
+                                    placeholder={`${item.placeholder}                                                         `}
+                                    keyboardType={item?.keyboard ? item?.keyboard : 'default'}
+                                    placeholderTextColor={'gray'}
+                                    selectionColor={Colors.DEFAULT_GREY}
+                                    style={mstyle.inputText}
+                                    multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
+                                    onChangeText={text => {
+                                      item.value = text
+                                      // // console.log(item)
+                                    }}
+                                    // value={item?.value}
+                                    defaultValue={item?.value}
+                                    activeUnderlineColor={Colors.DEFAULT_BLUE}
+                                    focusable={true}
+                                  />
+                                )
+  
+  
+                                // </View>
+                              )}
+  
+                            </View>
+                            ) }
 
                           </View>
+
+                         
 
                         )}
 
@@ -506,7 +665,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
 
 
       </View>
-    </View>
+    </ScrollView>
 
   )
 }

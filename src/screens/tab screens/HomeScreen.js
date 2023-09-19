@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image, Pressable, Alert } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image, Pressable, Alert, ActivityIndicator, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Feather from 'react-native-vector-icons/Feather'
@@ -8,6 +8,11 @@ import { AuthContext } from '../../components/context'
 import AsyncStorage from '@react-native-community/async-storage'
 import moment from 'moment'
 import { Colors } from '../../contants'
+import Geolocation from '@react-native-community/geolocation';
+import Frappe_Model from '../Frappe_Model'
+import Frappe_MSG from '../Frappe_MSG'
+
+
 
 
 
@@ -19,7 +24,7 @@ const HomeScreen = ({navigation}) => {
   const [ScreensData, setScreensData] = useState([
   { title: 'Lead', status: 'Completed', icon: 'Leave', route:'Lead', image: require('../../assets/img/attraction.png') },
   { title: 'Opportunity', status: 'Pending', icon: 'camera', route:'OpportunityScreen', image: require('../../assets/img/opportunity.png') },
-  { title: 'quotation', status: 'Completed', icon: 'camera', route:'Lead', image: require('../../assets/img/project-management.png') },
+  { title: 'Quotation', status: 'Completed', icon: 'camera', route:'QuatationScreen', image: require('../../assets/img/project-management.png') },
   { title: 'Sales Order', status: 'Completed', icon: 'camera', route:'SalesInvoiceScreen', image: require('../../assets/img/order.png') },
   ])
 
@@ -27,9 +32,38 @@ const HomeScreen = ({navigation}) => {
   const [session_started, setsession_started] = useState(false)
   const [session, setsession] = useState(0)
   const [sessionTimes, setsessionTimes] = useState(0)
+  const [mylocation, setmylocation] = useState('')
+  const [Greating_message, setGreating_message] = useState('')
+  const currentHour = moment().format("HH");
 
 
   useEffect(() => {
+    
+    if (currentHour >= 3 && currentHour < 12){
+      setGreating_message("Good Morning")
+    } else if (currentHour >= 12 && currentHour < 15){
+      setGreating_message("Good Afternoon")
+    }   else if (currentHour >= 15 && currentHour < 20){
+      setGreating_message("Good Evening")
+    } else if (currentHour >= 20 || currentHour < 3){
+      setGreating_message("Good Night")
+    } else {
+      setGreating_message('Hello')
+    }
+    let mylocation = {}
+  Geolocation.getCurrentPosition(info =>{
+    // // console.log('Location hai', info.coords.longitude,info.coords.latitude)
+      console.log(info.coords.longitude, info.coords.latitude)
+      setmylocation(`${info.coords.longitude}, ${info.coords.latitude}`)
+
+      // fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + info.coords.latitude + ',' + info.coords.longitude + '&key=' + myApiKey)
+      //   .then((response) => response.json())
+      //   .then((responseJson) => {
+      //       console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+      // })
+  })
+
+
     Checkuser()
     AsyncStorage.getItem("user_session").then((value) => {
       // console.log('session', value)
@@ -142,7 +176,7 @@ const HomeScreen = ({navigation}) => {
     }
   }
   
-
+const [loading, setloading] = useState(false)
   return (
     <SafeAreaView style={mystyles.container}>
       <StatusBar
@@ -151,20 +185,29 @@ const HomeScreen = ({navigation}) => {
         backgroundColor={'white'}
         showHideTransition={'fade'}
       />
-
+      {/* <Frappe_Model loading={loading} text={''}/> */}
+      {/* <Frappe_MSG visible={true} text={'nklndskl dff kd fmd m'} /> */}
+      
       <ScrollView>
+   
         
 
         <View style={{ backgroundColor: 'white', padding: 15, marginBottom: 20, borderRadius: 25, elevation: 4 }}>
 
-          <Text style={{ fontSize: 14, fontWeight: '600', color: 'black' }} >Good Evening,</Text>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: 'black' }} >
+            {Greating_message}
+            
+            
+            ,</Text>
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }} >Kamesh Kumar</Text>
           <Text style={{ fontSize: 14, fontWeight: '600', color: '#929eb4', paddingTop: 10 }} >{session_started?'You Started Your Day at':`Start Your Today's Session`} </Text>
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1f65ff' }} >{session_started?session:''}</Text>
+          <Text style={{ fontSize: 12, fontWeight: 'bold', color: 'black' }} ><MaterialCommunityIcons name={'map-marker-radius-outline'} size={15} /> {mylocation}</Text>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1f65ff' }} >{session_started?moment(session).format('d MMM hh:mm A'):''}</Text>
 
 
          <Pressable onPress={()=>{
           SessionToggle()
+          // setloading(true)
          }}>
          <View
           

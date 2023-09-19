@@ -8,7 +8,7 @@ const timeToString = (time) => {
   return date.toISOString().split('T')[0];
 }
 
-const DetailsScreen = () => {
+const CalenderScreen = () => {
   const [items, setItems] = React.useState({});
 
   const loadItems = (day) => {
@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailsScreen;
+export default CalenderScreen;

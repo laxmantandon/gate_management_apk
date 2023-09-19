@@ -1,4 +1,4 @@
-import { View, Text, FlatList, SafeAreaView, Pressable, Image, TextInput, ScrollView } from 'react-native'
+import { RefreshControl, View, Text, FlatList, SafeAreaView, Pressable, Image, TextInput, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Card from '../../components/Card'
 import mystyles from '../../css/mystyles'
@@ -6,59 +6,96 @@ import { Colors } from '../../contants'
 import mstyle from '../../components/mstyle'
 import FabButton from '../../components/FabButton'
 import Icon from 'react-native-vector-icons/Ionicons';
+import Frappe_Model from '../Frappe_Model'
+import frappe from '../../services/frappe'
 
 
 const LeadScreen = ({ navigation }) => {
-  const [ListData, setListData] = useState([{ title: 'First Title', subtitle: 'Subtitle 001' }])
+  const [ListData, setListData] = useState([])
   const [ScreensData, setScreensData] = useState([])
   const [responseData, setresponseData] = useState([])
+  const [loading, setloading] = useState(false)
+  const [start_limit, setstart_limit] = useState(0)
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setstart_limit(0)
+      getData()
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
   useEffect(() => {
     getData()
-
-
   }, [])
 
+
   const getData = () => {
-    var myHeaders = new Headers();
-    var requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'
-    };
+    
+    setloading(true)
+    frappe.get_list('Lead',filters={'modified_by':'kamesh@erevive.in'}, fields=["*"],start=start_limit).then((resp)=>{
+      // console.log(resp)
+      setloading(false)
+      if(resp.data){
+        setstart_limit(start_limit+21)
+        mapped_array = ListData
+      setresponseData(m?.data)
+      resp.data.forEach(a => {
+        // console.log(a)
+        mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
+        date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
+      });
+      setListData(mapped_array)
+      }else{
+        // setListData([])
+      }
 
-    fetch("https://dbh.erevive.cloud/api/resource/Lead?fields=[\"*\"]&filter={'modified_by':'kamesh@erevive.in'}", requestOptions)
-      .then(response => response.text())
-      .then(result => {
-        console.log(result)
-
-        let m = JSON.parse(result)
-        // console.log(m.data)
-        mapped_array = []
-        setresponseData(m?.data)
-        m.data.forEach(a => {
-          // console.log(a)
-          mapped_array.push({data:a, title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, date: a.creation, whatsapp: a.whatsapp_no, call: a.mobile_no })
-        });
-        setListData(mapped_array)
-
-
-
-      })
-      .catch(error => console.log('error', error));
-
-
-
+    }).catch(error =>{
+         setloading(false)
+         console.log('error', error)
+      });
   }
 
 
-  const searchFilterFunction = () => {
+  
+
+
+  const searchFilterFunction = (text) => {
+    setloading(true)
+    frappe.get_list('Lead',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
+      // console.log(resp)
+      setloading(false)
+      if(resp.data){
+        setstart_limit(start_limit+21)
+        mapped_array = start_limit?ListData:[]
+      setresponseData(m?.data)
+      resp.data.forEach(a => {
+        // console.log(a)
+        mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
+        date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
+      });
+      setListData(mapped_array)
+      }else{
+        // setListData([])
+      }
+
+    }).catch(error =>{
+         setloading(false)
+         console.log('error', error)
+      });
 
   }
 
 
   return (
     <SafeAreaView>
-      <ScrollView>
+            <Frappe_Model loading={loading} text={''} />
+
+      <ScrollView refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <View style={{ flexDirection: 'row' }}>
           <View style={[mstyle.inputContainer, { marginTop: 10, width: '83%', elevation: 2 }]}>
             <View style={mstyle.inputSubContainer}>
@@ -85,6 +122,7 @@ const LeadScreen = ({ navigation }) => {
 
         <FlatList
           data={ListData}
+          // inverted
           numColumns={1}
           renderItem={(item) => {
             return (
@@ -93,6 +131,24 @@ const LeadScreen = ({ navigation }) => {
                  }}>
                 <Card item={item} />
               </Pressable>
+            )
+          }}
+          onEndReachedThreshold={0.2}
+          onEndReached={()=>{getData()}}
+
+          ListEmptyComponent={()=>{
+            return(
+              <View style={{marginBottom:50,marginTop:100, marginHorizontal:10}}>
+                <Image source={require('../../assets/img/empty.jpg')} style={{ height:250, width:'100%'}}/>
+
+                <Pressable style={{ borderRadius:12, padding:12, borderWidth:1, borderColor:Colors.DEFAULT_BLUE }}
+                 onPress={()=>{
+                  getData()
+                }}>
+                  <Text style={{fontSize:12, fontWeight:'bold', color:Colors.DEFAULT_BLUE, textAlign:'center'}}> Refresh Now</Text>
+
+                </Pressable>
+              </View>
             )
           }}
         />

@@ -14,7 +14,7 @@ import HTMLView from 'react-native-htmlview';
 import moment from 'moment'
 
 
-const AddLeadScreen = ({ navigation, route: {
+const QuotationDetailsScreen = ({ navigation, route: {
   params: { item },
 }, }) => {
   const [FormData, setFormData] = useState([])
@@ -23,15 +23,20 @@ const AddLeadScreen = ({ navigation, route: {
   const [refreshing, setrefreshing] = useState(false)
   const [doc, setdoc] = useState()
   const [comment, setcomment] = useState('')
+  const [isUpdate, setisUpdate] = useState(false)
+
   useEffect(() => {
     getFormData()
-    console.log("Update", item)
+    if(item){
+      setisUpdate(true)
+    }
+    // console.log("Update", item)
   }, [])
 
   const getFormData = () => {
     setloading_text('Loading Doctype Fields')
     setloading(true)
-    frappe.get_doctype_fields('Lead').then((resp)=>{
+    frappe.get_doctype_fields('Quotation').then((resp)=>{
       let formd=getDoctypeFields(resp)
       if(item){
         getFormAllData(formd)
@@ -47,12 +52,14 @@ const AddLeadScreen = ({ navigation, route: {
 
   const getFormAllData=(formd)=>{
     // setloading(true)
-    setloading_text('Getting Fields Values')
-        frappe.get_doctype_fields_values('Lead',item.data.name).then((resp1)=>{
-          setdoc(resp1.docs[0])
-          formd = SetFieldsValue(formd,resp1.docs[0])
-        })
-        setFormData(formd)
+        setloading_text('Getting Fields Values')
+    
+          frappe.get_doctype_fields_values('Quotation',item.data.name).then((resp1)=>{
+            
+            setdoc(resp1.docs[0])
+            formd = SetFieldsValue(formd,resp1.docs[0])
+          })
+        setFormData(formd)   
         setloading(false)
         setloading_text()
         RefreshFlatlist()
@@ -77,9 +84,9 @@ const AddLeadScreen = ({ navigation, route: {
       return
     })
     let req = submitReqData(FormData)
-    if (item) {
+    if (isUpdate) {
       req.name = item.data.name
-      frappe.set_doc('Lead',req).then((result)=>{
+      frappe.set_doc('Quotation',req).then((result)=>{
         console.log('result',result)
         setloading(false)
         if(result.data){
@@ -103,7 +110,16 @@ const AddLeadScreen = ({ navigation, route: {
       })
 
     }else{
-      frappe.new_doc('Lead',req).then((result)=>{
+    //   if(item){
+    //   if(item.doctype !='Quotation'){
+    //     let lead_data = item.data
+    //     req.contact_person=lead_data.mobile_no
+    //     req.contact_person=lead_data.fist_name
+    //     req.party_name=lead_data.name
+    //     req.opportunity_from=item.doctype
+    //   }
+    // }
+      frappe.new_doc('Quotation',req).then((result)=>{
         console.log('result',result)
         setloading(false)
         if(result.data){
@@ -173,9 +189,9 @@ const AddLeadScreen = ({ navigation, route: {
   }
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <Frappe_Model loading={loading} text={loading_text} />
-      {/* <Text>AddLeadScreen</Text> */}
+      {/* <Text>QuotationDetailsScreen</Text> */}
       <FlatList
        onRefresh={()=>{
       }}
@@ -213,12 +229,12 @@ const AddLeadScreen = ({ navigation, route: {
       }}>
         <View style={{ backgroundColor: Colors.DEFAULT_BLUE, padding: 15, margin: 8, borderRadius: 5 }}>
           <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold', textAlign: 'center' }}>
-            {item ? 'Update Now' : 'Save Now'}
+            {isUpdate ? 'Update Now' : 'Save Now'}
           </Text>
         </View>
       </Pressable>
 
-      {item?(
+      {isUpdate?(
         <View>
           <Text style={{fontSize:15, fontWeight:700, color:'black', textAlign:'center'}}>Comments</Text>
           <TextInput
@@ -276,4 +292,4 @@ const AddLeadScreen = ({ navigation, route: {
   )
 }
 
-export default AddLeadScreen
+export default QuotationDetailsScreen

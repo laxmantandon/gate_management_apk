@@ -1,4 +1,4 @@
 import StaticImageService from './StaticImageService';
-import AuthenicationService from './AuthenticationService';
+import AuthenicationService from './frappe';
 
 export {StaticImageService, AuthenicationService};

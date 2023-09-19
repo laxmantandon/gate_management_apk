@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const QuatationScreen = () => {
+const FilterComponents = () => {
   return (
     <View>
-      <Text>QuatationScreen</Text>
+      <Text>FilterComponents</Text>
     </View>
   )
 }
 
-export default QuatationScreen
+export default FilterComponents

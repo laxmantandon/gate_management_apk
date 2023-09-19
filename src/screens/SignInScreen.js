@@ -7,7 +7,8 @@ import {
     Platform,
     StyleSheet ,
     StatusBar,
-    Alert
+    Alert,
+    ToastAndroid
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -21,6 +22,8 @@ import { AuthContext } from '../components/context';
 import axios from 'axios';
 import mstyle from '../components/mstyle';
 import { Colors } from '../contants';
+import Frappe_Model from './Frappe_Model';
+import { SuccessToast } from 'react-native-toast-message';
 
 
 
@@ -34,6 +37,7 @@ const SignInScreen = ({navigation}) => {
         isValidUser: true,
         isValidPassword: true,
     });
+    const [loading, setloading] = React.useState(false)
 
     const { colors } = useTheme();
 
@@ -95,11 +99,13 @@ const SignInScreen = ({navigation}) => {
     }
 
     const loginHandle = (userName, password) => {
+        setloading(true)
 
         if ( data.username?.length == 0 || data.password?.length == 0 ) {
             Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
                 {text: 'Okay'}
             ]);
+            setloading(false)
             return;
         }
 
@@ -133,6 +139,8 @@ const SignInScreen = ({navigation}) => {
                 
                 fetch("https://dbh.erevive.cloud/api/method/frappe.auth.get_logged_user", requestOptions)
                 .then(r =>r.text()).then(result =>{ console.log(result)
+                    setloading(false)
+
                
                             let res=JSON.parse(result)
                           if (res.message){
@@ -145,6 +153,16 @@ const SignInScreen = ({navigation}) => {
                             }]
                             console.log(foundUser)
                             signIn(foundUser);
+                            ToastAndroid.showWithGravityAndOffset(
+                                'Succesfully Login',
+                                ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+                              );
+                          }else{
+                            ToastAndroid.showWithGravityAndOffset(
+                                'Check Your Internet Connection',
+                                ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+                              );
+                            
                           }
                                 
 
@@ -156,10 +174,14 @@ const SignInScreen = ({navigation}) => {
                 [
                     {text: 'Okay'}
                 ]);
+                setloading(false)
+
                 return;
             }
           })
           .catch((error) => {
+            setloading(false)
+
             console.log(error);
           });
 
@@ -171,6 +193,9 @@ const SignInScreen = ({navigation}) => {
 
     return (
       <View style={[mstyle.container,{padding:20, paddingBottom:200}]}>
+
+<Frappe_Model loading={loading} text={''} />
+
           <StatusBar backgroundColor='white' barStyle="dark-content"/>
           {/* <View style={styles.header}> */}
             <Text style={[styles.text_header,{fontSize:80,paddingTop:70, textAlign:'center',color:Colors.GOOGLE_BLUE}]}>LOGO</Text>

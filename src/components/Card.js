@@ -42,20 +42,20 @@ const Card = ({ item }) => {
         <View style={{ flex: 1, flexDirection: 'row' }}>
           {data?.icon ? (<View style={{ borderTopLeftRadius: 8, borderBottomLeftRadius: 8,alignSelf:'center' }} >
             <Icon name={data.icon}
-              size={25} style={{ padding: 10, paddingRight: 1, color: data.icon_color ? data.icon_color : 'black' }} />
+              size={22} style={{ padding: 10, paddingRight: 1, color: data.icon_color ? data.icon_color : 'black' }} />
           </View>) : ('')}
 
           {data?.checkbox ?
             <View style={{ backgroundColor: Colors.SECONDARY_BLACK, borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }} >
               <Icon name={item.item.value === true ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
-                size={25} style={{ padding: 15, color: item.item.value === true ? 'green' : 'gray' }} />
+                size={22} style={{ padding: 15, color: item.item.value === true ? 'green' : 'gray' }} />
             </View> : ''}
 
 
           {data?.date ?
             <View style={{ backgroundColor: Colors.DEFAULT_BLUE, borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }} >
               <View style={{ padding: 10 }}>
-                <Text style={{ color: Colors.SECONDARY_WHITE, fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>{moment(data.date).format('Do')}</Text>
+                <Text style={{ color: Colors.SECONDARY_WHITE, fontWeight: 'bold', fontSize: 15, textAlign: 'center' }}>{moment(data.date).format('Do')}</Text>
                 <Text style={{ color: Colors.SECONDARY_WHITE, fontWeight: '600', fontSize: 12, textAlign: 'center' }}>{moment(data.date).format('MMM-YY')}</Text>
               </View>
             </View> : ''}
@@ -81,7 +81,7 @@ const Card = ({ item }) => {
 
           <View style={styles.detailContainer}>
             <View style={styles.titleContainer}>
-              <Text style={styles.listListTitle} numberOfLines={2}>
+              <Text style={styles.listListTitle} numberOfLines={1}>
                 {data?.title}
               </Text>
               
@@ -105,15 +105,17 @@ const Card = ({ item }) => {
             backgroundColor: "#dde9fd", borderTopRightRadius: 8, borderBottomRightRadius: 8, marginLeft: 'auto',
             padding: 10, flexDirection: 'row'
           }}>
+             <Icon onPress={() => {
+              Linking.openURL(`tel:${data.call}`)
+            }}
+              name={'call'} size={22} color={Colors.DEFAULT_BLUE} style={{ padding: 8 }} />
+              
             <Icon onPress={() => {
               Linking.openURL(`whatsapp://send?phone=91${data.whatsapp}`)
             }}
-              name={'logo-whatsapp'} size={27} color='green' style={{ paddingTop: 8, color: 'green' }} />
+              name={'logo-whatsapp'} size={22} color='green' style={{ paddingTop: 8, color: 'green' }} />
 
-            <Icon onPress={() => {
-              Linking.openURL(`tel:${data.call}`)
-            }}
-              name={'call'} size={27} color={Colors.DEFAULT_BLUE} style={{ padding: 8 }} />
+           
           </View>
             : ''}
 
@@ -128,13 +130,7 @@ const Card = ({ item }) => {
         </View>
         {data?.footer_details ? (<View style={{ backgroundColor: 'white',  width: '100%', borderTopColor:Colors.SECONDARY_GREEN, borderTopWidth:2, 
         borderBottomLeftRadius: 8, borderBottomRightRadius: 8 , paddingVertical:10, paddingHorizontal:8}}>
-
-<Text style={{fontSize:13,  color:'black'}}> Stage : - <Text style={{fontWeight:'600'}}>{data.subtitle}</Text> </Text>
-<Text style={{fontSize:13,  color:'black'}}> Start Date : - <Text style={{fontWeight:'600'}}>{moment(data.details.startDate).format('Do MMM-YY')}</Text> </Text>
-<Text style={{fontSize:13,  color:'black'}}> End Date : - <Text style={{fontWeight:'600'}}>{moment(data.enddate).format('Do MMM-YY')}</Text> </Text>
-<Text style={{fontSize:13,  color:'black'}}> Crop Farm Size : - <Text style={{fontWeight:'600'}}>{data.details.size}</Text> </Text>
-<Text style={{fontSize:13,  color:'black'}}> Crop Farm Unit : - <Text style={{fontWeight:'600'}}>{data.details.unit}</Text> </Text>
-          
+      
           </View>
           ) : ('')}
 
@@ -168,10 +164,9 @@ const styles = StyleSheet.create({
     // paddingVertical:1,
     borderRadius: 8,
     // flexDirection: 'row',
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     marginVertical: 1,
     elevation: 2
-
 
   },
   detailContainer: {
@@ -180,16 +175,15 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 10,
     alignItems: 'center',
-    paddingVertical: 7,
-    paddingHorizontal: 4
-
-    // width: '55%',
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    width: '60%',
   },
 
   listListTitle: {
     color: 'black',
     // fontFamily: Fonts.POPPINS_MEDIUM,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     letterSpacing: 0.1,
     // width: '100%',
