@@ -12,6 +12,7 @@ import { RNCamera } from 'react-native-camera';
 import ProductDetailsScreen from './ProductDetailsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Frappe_Model from './Frappe_Model';
+import moment from 'moment';
 
 
 
@@ -46,6 +47,8 @@ const QrscannerScreeen = ({navigation,route: {
 
   const [docname, setdocname] = useState('')
   const [islead, setislead] = useState(false)
+  const [lead, setlead] = useState('')
+  const [lead_name, setlead_name] = useState('')
 
 
   
@@ -59,6 +62,9 @@ const QrscannerScreeen = ({navigation,route: {
       // console.log('Create Quotation',item) 
 
         if (item.doctype=='Lead'){
+          setlead('Lead')
+          setlead_name(item.data.name)
+          setloading(true)
           setislead(true)
           setdocname(item.data.name)
           setcurrent_customer('')
@@ -67,18 +73,22 @@ const QrscannerScreeen = ({navigation,route: {
             console.log('Create oppurtunity',item)
             
             createCartStorage()
+            setloading(false)
 
         }else if (item.doctype=='Opportunity'){
+          setloading(true)
+
             console.log('Create Quotation',item) 
+            setlead(item.doc.opportunity_from)
+            setlead_name(item.doc.party_name)
             setdocname(item.name)
             setcurrent_customer(item.party_name)
             customerDetails[0].value=`${item.customer_name}`
             customerDetails[1].value=item?.contact_mobile
-            createCartStorage()
             mapped_array=[]
 
-            if(item?.items){
-              item?.items.forEach(a => {
+            if(item.doc.items){
+              item.doc.items.forEach(a => {
                 a.title= a.item_name
                 a.status='Add to cart'
                 a.percent=a.qty
@@ -86,9 +96,14 @@ const QrscannerScreeen = ({navigation,route: {
                 a.subtitle = `Price - ${a.base_rate}`
                 mapped_array.push(a)
               });
+              // console.log(mapped_array)
               setcart(mapped_array)
-              console.log(cart)
+              // console.log(cart)
+              setloading(false)
+
             }
+            createCartStorage()
+
 
 
 
@@ -106,7 +121,17 @@ const QrscannerScreeen = ({navigation,route: {
   }, [])
 
 
+  const clearStorage=()=>{
+    AsyncStorage.removeItem("AllCart").then(s => {
+      let ab_cartlist= JSON.parse(s) 
+
+    })
+
+  }
+
   const createCartStorage = () => {
+    setloading(true)
+
     AsyncStorage.getItem("AllCart").then(s => {
       console.log(JSON.parse(s))
 
@@ -128,7 +153,7 @@ const QrscannerScreeen = ({navigation,route: {
                               console.log(cust)
                     let newStorage=docname?docname:`cust_cart${ab_cartlist.length}`
                     if(!current_customer){
-                      createCustomer(cust[0].value)
+                      // createCustomer(cust[0].value)
                     }
                     
                     if (newStorage){
@@ -143,7 +168,12 @@ const QrscannerScreeen = ({navigation,route: {
                           if(item?.items){
                             
                           }else{
-                            setcart([])
+                            if(item.doc.items){
+
+                            }else{
+                              setcart([])
+                            }
+                            
                           }
                           setcurrent_storage(newStorage)
   
@@ -158,9 +188,11 @@ const QrscannerScreeen = ({navigation,route: {
         // setcartList(JSON.parse(s))
         // console.log('hai',s)
 
+
       }
     })
 
+    setloading(false)
 
     
   }
@@ -447,7 +479,8 @@ const QrscannerScreeen = ({navigation,route: {
                   'Opportunity Created',
                   ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
                 );
-                navigation.goBack()
+                navigation.navigate('OpportunityScreen')
+
 
                 // CreateQuotation()
                
@@ -475,9 +508,11 @@ const QrscannerScreeen = ({navigation,route: {
 
     AsyncStorage.getItem(current_storage).then((res_cart) => {
       let req = JSON.parse(res_cart)
-      req[0].value.quotation_to="Customer"
-      req[0].value.transaction_date="2023-08-25"
+      req[0].value.quotation_to= lead?lead:"Customer"
+      req[0].value.transaction_date=moment().format('yy-MM-DD')
+      req[0].value.party_name=lead_name?lead_name:''
       req[0].value.order_type="Sales"
+      req[0].value.gst_category="Unregistered"
       // req[0].value.transaction_date="Customer"
       
       if(!req[0].value.party_name){
@@ -516,13 +551,17 @@ const QrscannerScreeen = ({navigation,route: {
                 'Quotation Created',
                 ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
               );
-              navigation.goBack()
+              // navigation.goBack()
+              navigation.navigate('QuatationScreen')
+
               AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy)=>{
                 console.log('create ho gya',JSON.parse(uy))
                 
                
               })
 
+            }else{
+              Alert.alert(req.exc_type, res.exception)
             }
 
           

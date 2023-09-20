@@ -25,7 +25,7 @@ const HomeScreen = ({navigation}) => {
   { title: 'Lead', status: 'Completed', icon: 'Leave', route:'Lead', image: require('../../assets/img/attraction.png') },
   { title: 'Opportunity', status: 'Pending', icon: 'camera', route:'OpportunityScreen', image: require('../../assets/img/opportunity.png') },
   { title: 'Quotation', status: 'Completed', icon: 'camera', route:'QuatationScreen', image: require('../../assets/img/project-management.png') },
-  { title: 'Sales Order', status: 'Completed', icon: 'camera', route:'SalesInvoiceScreen', image: require('../../assets/img/order.png') },
+  { title: 'Sales Order', status: 'Completed', icon: 'camera', route:'SalesOrderScreen', image: require('../../assets/img/order.png') },
   ])
 
   const { signOut } = React.useContext(AuthContext);

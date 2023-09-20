@@ -3,7 +3,7 @@ const base_url ='https://dbh.erevive.cloud/'
 const base_url2 =`${base_url}api/resource`
 const base_url3 =`${base_url}api/method`
 import NetInfo from "@react-native-community/netinfo";
-import {StyleSheet} from 'react-native'
+import {Alert, StyleSheet} from 'react-native'
 
 
 const headers = new Headers();
@@ -108,7 +108,8 @@ const new_doc = async (doctype, req) => {
     );
     return Response?.data;
   } catch (error) {
-    // console.log(error.response.data);
+    console.log(error.response.data);
+    Alert.alert('Error',error.response.data?.exception)
     return {status: false, message: 'Oops! Something went wrong'};
   }
 };
@@ -129,13 +130,13 @@ const add_comments = async (req) => {
 
 
 const search_links = async (req) => {
-  req ={
-txt:'' ,
-doctype: 'DocType',
-ignore_user_permissions: 0,
-reference_doctype: 'Opportunity',
-filters: {"name":["in",["Customer","Lead","Prospect"]]}
-  }
+//   req ={
+// txt:'' ,
+// doctype: 'DocType',
+// ignore_user_permissions: 0,
+// reference_doctype: 'Opportunity',
+// filters: {"name":["in",["Customer","Lead","Prospect"]]}
+//   }
   try {
     let Response = await AuthRequest.post(
       `${base_url3}/frappe.desk.search.search_link`,req,headers

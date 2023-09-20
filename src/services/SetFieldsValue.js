@@ -5,7 +5,7 @@ const SetFieldsValue = (formdata,results)=>{
           
     formdata.forEach(i => {
             if(i.key=='items'){
-                console.log( results[i.key])
+                // console.log( results[i.key])
                 if (results[i.key]==[]){
                     i.value=results[i.key]
                 }
@@ -14,8 +14,8 @@ const SetFieldsValue = (formdata,results)=>{
                     a.title= a.item_name
                     a.status='Add to cart'
                     a.percent=a.qty
-                    a.rate=a.standard_rate
-                    a.subtitle = `Price - ${a.standard_rate}`
+                    a.rate=a.base_rate
+                    a.subtitle = `Price - ${a.base_rate}`
                   });
 
                   i.value=results[i.key]

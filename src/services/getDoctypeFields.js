@@ -49,8 +49,8 @@ const getDoctypeFields = (formdata)=>{
         fieldtype='select'
         a.fieldvalue =''
         link_doctype = a.options
-        if(a.fieldname=='opportunity_from'){
-          a.options=[ 'Lead','Customer']
+        if(a.fieldname=='opportunity_from' || a.fieldname=='quotation_to'){
+          a.options=[ 'Lead','Customer','Prospect']
         }else{
         a.options = []
         }

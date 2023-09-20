@@ -171,8 +171,8 @@ if(item.options.length >0){
 
     }
   }
-  // const [read_only, setread_only] = useState(item?.read_only?'none':'auto')
-  const [read_only, setread_only] = useState(item?.read_only?'auto':'auto')
+  const [read_only, setread_only] = useState(item?.read_only?'none':'auto')
+  // const [read_only, setread_only] = useState(item?.read_only?'auto':'auto')
 
   const refreshGetData=()=>{
     
@@ -240,7 +240,7 @@ if(item.options.length >0){
   }, []);
 
   return (
-    <ScrollView
+    <View
     refreshControl={
       <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
     }
@@ -405,8 +405,8 @@ if(item.options.length >0){
                   </View>
                 ) : (
                   <View>
-                    <View style={mstyle.inputContainer}>
-                      <View style={mstyle.inputSubContainer}>
+                    <View style={[mstyle.inputContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
+                      <View style={[mstyle.inputSubContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
 
                         {item?.type === 'select' ? (
                           <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -622,7 +622,7 @@ if(item.options.length >0){
                                     keyboardType={item?.keyboard ? item?.keyboard : 'default'}
                                     placeholderTextColor={'gray'}
                                     selectionColor={Colors.DEFAULT_GREY}
-                                    style={mstyle.inputText}
+                                    style={[mstyle.inputText,{backgroundColor:item?.read_only?'silver':''}]}
                                     multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
                                     onChangeText={text => {
                                       item.value = text
@@ -665,7 +665,7 @@ if(item.options.length >0){
 
 
       </View>
-    </ScrollView>
+    </View>
 
   )
 }

@@ -14,7 +14,7 @@ import HTMLView from 'react-native-htmlview';
 import moment from 'moment'
 
 
-const AddOpportunityScreen = ({ navigation, route: {
+const AddSalesOrderScreen = ({ navigation, route: {
   params: { item },
 }, }) => {
   const [FormData, setFormData] = useState([])
@@ -36,7 +36,7 @@ const AddOpportunityScreen = ({ navigation, route: {
   const getFormData = () => {
     setloading_text('Loading Doctype Fields')
     setloading(true)
-    frappe.get_doctype_fields('Opportunity').then((resp)=>{
+    frappe.get_doctype_fields('Sales Order').then((resp)=>{
       let formd=getDoctypeFields(resp)
       if(item){
         getFormAllData(formd)
@@ -53,42 +53,13 @@ const AddOpportunityScreen = ({ navigation, route: {
   const getFormAllData=(formd)=>{
     // setloading(true)
         setloading_text('Getting Fields Values')
-        if(item.doctype=='Lead'){
-          setisUpdate(false)
-          let lead_data = item.data
-          formd.forEach(a => {
-            if(a.key=='opportunity_from'){
-              // console.log('opportunity',a)
-              a.value = item.doctype
-            }
-
-            if(a.key=='party_name'){
-              a.value = lead_data.name
-            }
-
-            if(a.fieldname=='status'){
-              a.value = 'Open'
-            }
-            if(a.key=='contact_person'){
-              a.value = lead_data.fist_name
-            }
-            if(a.key=='contact_mobile'){
-              a.value = lead_data.mobile_no
-            }
-
-            if(a.key=='opportunity_date'){
-              a.value = moment().format('yy-mm-dd')
-            }
-
-          });
-          setFormData(formd)        
-        }
-          frappe.get_doctype_fields_values('Opportunity',item.data.name).then((resp1)=>{
+       
+          frappe.get_doctype_fields_values('Sales Order',item.data.name).then((resp1)=>{
             
             setdoc(resp1.docs[0])
             formd = SetFieldsValue(formd,resp1.docs[0])
             item.doc = resp1.docs[0]
-            item.doctype='Opportunity'
+            item.doctype='Sales Order'
           })
           setFormData(formd)   
                
@@ -111,40 +82,6 @@ const AddOpportunityScreen = ({ navigation, route: {
   const submitForm = () => {
     // console.log('clicked')
       setloading(true)
-      if(item){
-        if(item.doctype=='Lead'){
-          let lead_data = item.data
-          FormData.forEach(a => {
-            if(a.key=='opportunity_from'){
-              // console.log('opportunity',a)
-              a.value = item.doctype
-            }
-            if(a.key=='party_name'){
-              a.value = lead_data.name
-            }
-            if(a.key=='status'){
-              a.value = 'Open'
-            }
-            if(a.key=='contact_person'){
-              a.value = lead_data.fist_name
-            }
-            if(a.key=='contact_mobile'){
-              a.value = lead_data.mobile_no
-            }
-            if(a.key=='company'){
-              a.value = 'Dream Big Hospitality LLP'
-            }
-            if(a.key=='mobile_no'){
-              a.value = lead_data.mobile_no
-            }
-            if(a.key=='phone'){
-              a.value = lead_data.mobile_no
-            }
-
-          })
-          
-        }
-      }
 
     FormData.forEach(n => {
       if (!n.value) {
@@ -155,8 +92,8 @@ const AddOpportunityScreen = ({ navigation, route: {
     let req = submitReqData(FormData)
     if (isUpdate) {
       req.name = item.data.name
-      frappe.set_doc('Opportunity',req).then((result)=>{
-        console.log('result',result)
+      frappe.set_doc('Sales Order',req).then((result)=>{
+        // console.log('result',result)
         setloading(false)
         if(result.data){
           ToastAndroid.showWithGravityAndOffset(
@@ -179,18 +116,8 @@ const AddOpportunityScreen = ({ navigation, route: {
       })
 
     }else{
-
-      if(item){
-        if(item.doctype=='Lead'){
-          let lead_data = item.data
-          req.mobile_no=lead_data.mobile_no
-          req.phone=lead_data.mobile_no
-          req.party_name=lead_data.name
-          req.opportunity_from=item.doctype
-        }
-      }
-      
-      frappe.new_doc('Opportunity',req).then((result)=>{
+   
+      frappe.new_doc('Sales Order',req).then((result)=>{
         // console.log('result',result)
         setloading(false)
         if(result.data){
@@ -198,7 +125,7 @@ const AddOpportunityScreen = ({ navigation, route: {
             'Succesfully Created',
             ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
           );
-          navigation.navigate('OpportunityScreen')
+          navigation.navigate('SalesOrderScreen')
         }else{
           ToastAndroid.showWithGravityAndOffset(
             'Something Wrong',
@@ -301,7 +228,7 @@ const AddOpportunityScreen = ({ navigation, route: {
         }}
       />
 
-      <Pressable onPress={() => {
+      <Pressable onPressIn={() => {
         submitForm()
       }}>
         <View style={{ backgroundColor: Colors.DEFAULT_BLUE, padding: 15, margin: 8, borderRadius: 5 }}>
@@ -369,4 +296,4 @@ const AddOpportunityScreen = ({ navigation, route: {
   )
 }
 
-export default AddOpportunityScreen
+export default AddSalesOrderScreen

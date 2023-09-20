@@ -43,6 +43,8 @@ import DoctypeListScreen from './src/screens/Home Tab/DoctypeListScreen';
 import route from './src/screens/route/route';
 import QuotationScreen from './src/screens/Home Tab/QuotationScreen';
 import QuatationDetailsScreen from './src/screens/Home Tab/QuotationDetailsScreen';
+import SalesOrderScreen from './src/screens/Home Tab/SalesOrderScreen';
+import AddSalesOrderScreen from './src/screens/Home Tab/AddSalesOrderScreen';
 // import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const Drawer = createDrawerNavigator();
@@ -236,7 +238,8 @@ const App = () => {
                   return (
                     <View>
                       {item?(
-                        <Pressable 
+                       <View>
+                         <Pressable 
                         onPress={() => { 
                           // navigation.navigate('QrscannerScreeen', Item = {item})
                           navigation.navigate('AddOpportunityScreen', Item = {item})
@@ -248,6 +251,20 @@ const App = () => {
                             <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Opportunity</Text>
                           </View>
                         </Pressable>
+
+                        <Pressable 
+                        onPress={() => { 
+                          navigation.navigate('QrscannerScreeen', Item = {item})
+                          // navigation.navigate('AddOpportunityScreen', Item = {item})
+                      
+                      }}
+                         style={{ flexDirection: 'row' }}>
+                          <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                            <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                            <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Quotation</Text>
+                          </View>
+                        </Pressable>
+                        </View>
                       ):''}
                     </View>
                   )
@@ -304,7 +321,7 @@ const App = () => {
                   headerRight: () => {
                     return (
                       <View>
-                        {item?(
+                        {/* {item?(
                           <Pressable 
                           onPress={() => { 
                             navigation.navigate('QrscannerScreeen', Item = {item}) 
@@ -316,7 +333,7 @@ const App = () => {
                               <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Quotation</Text>
                             </View>
                           </Pressable>
-                        ):''}
+                        ):''} */}
                       </View>
                     )
                   },
@@ -324,7 +341,7 @@ const App = () => {
               } /> 
 
               <stack.Screen name="SalesInvoiceScreen" component={SalesInvoiceScreen} options={({ navigation }) => ({
-                title: 'Sales Order', headerRight: () => {
+                title: 'Sales Invoice', headerRight: () => {
                   return (
                     <View style={{ flexDirection: 'row' }}>
                       <View style={{ paddingHorizontal: 5 }}>
@@ -339,7 +356,7 @@ const App = () => {
               })
               } />
 
-              <stack.Screen name="AddSalesInvoiceScreen" component={AddSalesInvoiceScreen} options={{ title: 'Sales Order Details' }} />
+              <stack.Screen name="AddSalesInvoiceScreen" component={AddSalesInvoiceScreen} options={{ title: 'Sales Invoice Details' }} />
 
 
 
@@ -401,10 +418,74 @@ const App = () => {
                             // navigation.navigate('QrscannerScreeen', Item = {item}) 
                         }}
                            style={{ flexDirection: 'row' }}>
-                            <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                            {/* <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
                               <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
                               <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Sales order</Text>
-                            </View>
+                            </View> */}
+                          </Pressable>
+                        ):''}
+                      </View>
+                    )
+                  },
+              })
+              } />
+
+<stack.Screen name="SalesOrderScreen" component={SalesOrderScreen} options={({ navigation }) => ({
+                 headerTitle:()=>{
+                  return(
+                  <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Sales Order</Text>
+                  </View>
+                  )
+  
+                  },
+                
+                headerRight: () => {
+                  return (
+                     <Pressable  onPress={() => { navigation.navigate('AddSalesOrderScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <View style={{ paddingHorizontal: 1 }}>
+                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
+                     </View>
+                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Sales Order</Text>
+                   </Pressable>
+                  )
+                }
+
+              })
+              } />
+              <stack.Screen name="AddSalesOrderScreen" component={AddSalesOrderScreen} options={({ navigation, route: {
+                params: { item },
+              }
+              }) => ({
+                title: 'Details Sales Order', 
+             
+                headerTitle:()=>{
+                  return(<View>
+                      {item?(<View>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Sales Order</Text>
+                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
+                      </View>):(
+                      <View>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Sales Order</Text>
+                    </View>)}
+  
+                    </View>
+                  )
+  
+                  },
+                  headerRight: () => {
+                    return (
+                      <View>
+                        {item?(
+                          <Pressable 
+                          onPress={() => { 
+                            // navigation.navigate('QrscannerScreeen', Item = {item}) 
+                        }}
+                           style={{ flexDirection: 'row' }}>
+                            {/* <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
+                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Sales order</Text>
+                            </View> */}
                           </Pressable>
                         ):''}
                       </View>
