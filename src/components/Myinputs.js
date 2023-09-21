@@ -21,7 +21,7 @@ import frappe from '../services/frappe'
 
 
 
-const MYinputs = ({ item }) => {
+const MYinputs = ({ item,inputrefresh }) => {
   // // console.log('FROM MY INPUT',  item)
 
   const [visible, setIsVisible] = useState(false);
@@ -219,8 +219,8 @@ if(item.options.length >0){
 
         console.log(result)
         mapped=[]
-        result.results.forEach(a => {
-          mapped.push({'name':a.value,'id':a.value})
+        result.data.forEach(a => {
+          mapped.push({'name':a.name,'id':a.name})
         });
         item.options=mapped
         console.log(item.options)
@@ -405,11 +405,13 @@ if(item.options.length >0){
                   </View>
                 ) : (
                   <View>
+                   
                     <View style={[mstyle.inputContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
                       <View style={[mstyle.inputSubContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
 
                         {item?.type === 'select' ? (
                           <View style={{ flex: 1, flexDirection: 'row' }}>
+                           
 
                             <SelectDropdown
                               data={item?.options}
@@ -442,7 +444,9 @@ if(item.options.length >0){
                                 // console.log(selectedItem, index)
                                 item.value = selectedItem
                                 item.index = index
-
+                                if(inputrefresh){
+                                inputrefresh()
+                                }
                                 // LinkedDoctypeData.forEach(a => {
                                 //   if(a.name==selectedItem){
                                 //     item.fetch=  a
@@ -506,7 +510,8 @@ if(item.options.length >0){
                                 </View>
                               ) : (
 
-                                <SearchableDropDown zIndex={999}
+                               <View style={{flex:1}}>
+                                 <SearchableDropDown zIndex={999}
                                   onItemSelect={(kitem) => {
                                     // alert('select dealer')
                                     // console.log('clicked',kitem)
@@ -515,6 +520,9 @@ if(item.options.length >0){
                                     console.log('clicked', item.data)
                                     setloading(true)
                                     refreshGetData()
+                                    if(inputrefresh){
+                                    inputrefresh()
+                                    }
 
 
                                   }}
@@ -550,6 +558,8 @@ if(item.options.length >0){
                                       },
                                       onTextChange: text => {
                                         getfiltersdata(text)
+                                        setloading(true)
+                                        refreshGetData()
 
                                       }
                                     }
@@ -560,6 +570,7 @@ if(item.options.length >0){
                                     }
                                   }
                                 />
+                                </View>
                               )}
 
                             </View>

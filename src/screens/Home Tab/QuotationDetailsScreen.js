@@ -34,9 +34,9 @@ const QuotationDetailsScreen = ({ navigation, route: {
 
   useEffect(() => {
     getFormData()
-    if (item) {
-      setisUpdate(true)
-    }
+    // if (item) {
+    //   setisUpdate(true)
+    // }
     // console.log("Update", item)
   }, [])
 
@@ -47,10 +47,22 @@ const QuotationDetailsScreen = ({ navigation, route: {
       let formd = getDoctypeFields(resp)
 
       if (item) {
+        if(item.doctype=='Lead' || item.doctype=='Opportunity'){
+          console.log(item)
+
+          getDefaultValues(formd)
+          setFormData(formd)
+          setloading(false)
+          setloading_text()
+        }else{
+        setisUpdate(true)
         getFormAllData(formd)
+
+        
+        }
+
       } else {
         getDefaultValues(formd)
-
         setFormData(formd)
         setloading(false)
         setloading_text()
@@ -68,23 +80,58 @@ const QuotationDetailsScreen = ({ navigation, route: {
         // a.read_only=1
         // a.type='text'
       }
+
+      if (a.key == 'items') {
+        if(item){
+        if(item.doctype=='Opportunity'){
+          // console.log(item.doc)
+          a.value=item.doc.items
+        }
+      }
+       
+        // a.read_only=1
+        // a.type='text'
+      }
+
+      if (a.key == 'party_name') {
+        if(item){
+          if(item.doctype!='Quotation'){
+            a.value=item.data.name
+          }
+        }
+        if(a.value){
+        a.read_only=1
+        a.type='text'
+        }
+      }
+
       if (a.key == 'selling_price_list') {
         a.value = 'Standard Buying'
         // a.read_only=1
         // a.type='text'
       }
       if (a.key == 'naming_series') {
+        
         a.value = 'SAL-QTN-.YYYY'
-        // a.read_only=1
-        // a.type='text'
+        if(a.value){
+a.read_only=1
+        a.type='text'
+        }
+        
       }
       if (a.key == 'quotation_to') {
-        a.value = 'Lead'
-        getfiltersdata('','Lead')
-
-        // a.read_only=1
-        // a.type='text'
+        if(item){
+          if(item.doctype!='Quotation'){
+            a.value=item.doctype
+          }
+        }
+        if(a.value) {
+        a.read_only=1
+        a.type='text'
+        }
       }
+
+      
       if (a.key == 'order_type') {
         a.value = 'Sales'
         a.read_only = 1
@@ -131,11 +178,10 @@ const QuotationDetailsScreen = ({ navigation, route: {
     // setloading(true)
     setloading_text('Getting Fields Values')
     frappe.get_doctype_fields_values('Quotation', item.data.name).then((resp1) => {
-
       setdoc(resp1.docs[0])
       formd = SetFieldsValue(formd, resp1.docs[0])
+      getDefaultValues(formd)
     })
-    // getDefaultValues(formd)
     setFormData(formd)
     setloading(false)
     setloading_text()
@@ -215,56 +261,67 @@ const QuotationDetailsScreen = ({ navigation, route: {
 
   }
 
-  const AddComments = () => {
-    if (!comment) {
-      alert('Write something comment')
-      return
-    }
-    // setloading(true)
-    let comments = `<div class="ql-editor read-mode"><p>${comment}</p></div>`
-    let req = {
-      docs: doc,
-      note: comments,
-      method: 'add_note',
-      args: { 'note': comments }
-    }
-    // console.log(req)
-    frappe.add_comments(req).then((result) => {
-      // console.log('result',result)
-      setloading(false)
-      if (result.docs) {
-        getFormData()
-        ToastAndroid.showWithGravityAndOffset(
-          'Succesfully Comment Added',
-          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
-        );
-        // navigation.goBack()
-        getFormData()
-      } else {
-        ToastAndroid.showWithGravityAndOffset(
-          'Something Wrong',
-          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
-        );
+  // const AddComments = () => {
+  //   if (!comment) {
+  //     alert('Write something comment')
+  //     return
+  //   }
+  //   // setloading(true)
+  //   let comments = `<div class="ql-editor read-mode"><p>${comment}</p></div>`
+  //   let req = {
+  //     docs: doc,
+  //     note: comments,
+  //     method: 'add_note',
+  //     args: { 'note': comments }
+  //   }
+  //   // console.log(req)
+  //   frappe.add_comments(req).then((result) => {
+  //     // console.log('result',result)
+  //     setloading(false)
+  //     if (result.docs) {
+  //       getFormData()
+  //       ToastAndroid.showWithGravityAndOffset(
+  //         'Succesfully Comment Added',
+  //         ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+  //       );
+  //       // navigation.goBack()
+  //       getFormData()
+  //     } else {
+  //       ToastAndroid.showWithGravityAndOffset(
+  //         'Something Wrong',
+  //         ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+  //       );
 
-      }
-    }).catch(e => {
-      setloading(false)
-      ToastAndroid.showWithGravityAndOffset(
-        'Something Wrong',
-        ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
-      );
-    })
+  //     }
+  //   }).catch(e => {
+  //     setloading(false)
+  //     ToastAndroid.showWithGravityAndOffset(
+  //       'Something Wrong',
+  //       ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+  //     );
+  //   })
 
-  }
+  // }
 
-  const getrefreshlist=()=>{
+  function getrefreshlist(){
     setloading(true)
     setTimeout(() => {
+      if(!item){
+        let mdoc=FormData[2]
+        if(mdoc.key=='party_name'){
+          mdoc.options=[],
+          mdoc.type='searchable',
+          mdoc.link_doctype=FormData[1].value
+        }
+      
+        
+      }
+      console.log('refreshing data',FormData[1].value)
       setloading(false)
-    }, 1000);
+    }, 100);
   }
 
-  const getfiltersdata = (text, doctype) => {
+  const getfiltersdata = (text,kitem, doctype) => {
     let req = {
       txt: text ? text : '',
       doctype: doctype,
@@ -280,9 +337,11 @@ const QuotationDetailsScreen = ({ navigation, route: {
         result.results.forEach(a => {
           mapped.push({ 'id': a.value, 'name': a.description })
         });
-      console.log(mapped)
-      party_.options = mapped
-      setparty_name(party_)
+      kitem.options = mapped
+      console.log(kitem.options)
+      getrefreshlist()
+
+      // setparty_name(party_)
 
     })
   }
@@ -298,223 +357,29 @@ const QuotationDetailsScreen = ({ navigation, route: {
         <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Make Sales Order</Text>
       </Pressable> : ''}
 
-      <FlatList
+
+{FormData.map(item => {
+   return (
+    <View style={{ flex: 1 }}>
+      { item.type=='Items'?(<CartScreen item={item} />):(<MYinputs item={item} inputrefresh={getrefreshlist} />) }
+    </View>
+  )
+})}
+      {/* <FlatList
         onRefresh={() => {
         }}
         refreshing={refreshing}
         data={FormData}
         numColumns={1}
         renderItem={({ item }) => {
-          if (item.key == 'items') {
-            // console.log(item)
-            if (item.value) {
-              item.value.forEach(a => {
-                a.title = a.item_name
-                a.status = 'Add to cart'
-                a.percent = a.qty
-                a.rate = a.rate
-                a.subtitle = `Price - ${a.rate}`
-              });
-            }
-          }
+          
           return (
             <Pressable style={{ flex: 1 }}>
-              {item.type == 'Items' ? (<CartScreen item={item} />) : (
-                <View>
-                  {item.key == 'quotation_to' ? (
-                    <View>
-                      <Text style={{fontSize:12, color:'black', fontWeight:'500', margin:7}}> {item.label}</Text>
-                      <View style={[mstyle.inputContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
-                      <View style={[mstyle.inputSubContainer,{backgroundColor:item?.read_only?'silver':'white', marginBottom:1}]}>
-                          {item?.type === 'select' ? (
-                            <View style={{ flex: 1, flexDirection: 'row' }}>
-
-                              <SelectDropdown
-                                data={item?.options}
-                                onChangeSearchInputText={(text) => {
-                                  // console.log(text)
-                                  // if(item.link_doctype){
-                                  //   getLinkedDoctype(text)
-                                  // }
-                                }}
-                                defaultValue={item.value}
-                                defaultValueByIndex={0}
-                                defaultButtonText={item?.label}
-                                buttonStyle={{
-                                  backgroundColor: 'white',
-                                  width: '100%', height: 36
-                                }}
-                                buttonTextStyle={{ fontSize: 12, }}
-
-                                renderDropdownIcon={isOpened => {
-                                  return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={15} />;
-                                }}
-
-                                dropdownIconPosition={'right'}
-                                dropdownStyle={[mstyle.inputContainer]}
-                                selectedRowStyle={{ backgroundColor: Colors.LIGHT_BLUE, borderColor: Colors.LIGHT_BLUE }}
-                                rowTextStyle={{ fontSize: 12, fontWeight: '600' }}
-                                rowStyle={{ backgroundColor: Colors.SECONDARY_WHITE, borderColor: 'silver' }}
-
-                                onSelect={(selectedItem, index) => {
-                                  // console.log(selectedItem, index)
-                                  item.value = selectedItem
-                                  item.index = index
-                                  getrefreshlist()
-                                  getfiltersdata('',item.value)
-                                  // LinkedDoctypeData.forEach(a => {
-                                  //   if(a.name==selectedItem){
-                                  //     item.fetch=  a
-                                  //   }
-
-                                  // });
-
-                                }}
-                                buttonTextAfterSelection={(selectedItem, index) => {
-                                  // text represented after item is selected
-                                  // if data array is an array of objects then return selectedItem.property to render after item is selected
-                                  return selectedItem
-                                }}
-                                rowTextForSelection={(item, index) => {
-                                  // text represented for each item in dropdown
-                                  // if data array is an array of objects then return item.property to represent item in dropdown
-                                  return item
-                                }}
-
-
-                                search
-                                searchInputStyle={{
-                                  backgroundColor: 'white',
-                                  borderBottomWidth: 1,
-                                  borderBottomColor: '#FFF',
-                                }}
-                                searchPlaceHolder={'Search here'}
-                                searchPlaceHolderColor={'darkgrey'}
-                                renderSearchInputLeftIcon={() => {
-                                  return <FontAwesome name={'search'} color={'#444'} size={18} />;
-                                }}
-                              />
-                            </View>
-
-                          ) : ('')}
-                        </View>
-                      </View>
-
-
-                      
-
-                    </View>
-                  ) : (
-                      <View>
-                        {item.key == 'party_name' ? (
-                          <View>
-                                                                  
-
-                      <Text style={{fontSize:12, color:'black', fontWeight:'500', margin:7}}> {item.label}</Text>
-                      <Pressable onPress={console.log(item.options)}></Pressable>
-
-<View style={[mstyle.inputContainer]}>
-                      <View style={[mstyle.inputSubContainer,]}>
-                          <View style={{ marginBottom: 1, flex:1 }}>
-                            {item.value ? (
-                              <View style={{
-                                padding: 6, marginTop: 2, flexDirection: 'row',
-                                backgroundColor: 'white', borderColor: 'silver',
-                                borderWidth: 0, borderRadius: 5, width: '100%'
-                              }}>
-
-                                <Text style={{ color: 'black', width: '90%', fontSize: 15, fontWeight: 'bold' }}>
-                                  {item.value}</Text>
-                                <Icon onPress={() => {
-                                  item.value = ''
-                                  item.data = {}
-                                  getrefreshlist()
-
-                                  // refreshGetData()
-
-                                }} name='close-circle-outline' size={25} style={{ color: 'red' }}></Icon>
-
-                              </View>
-                            ) : (
-
-                              <SearchableDropDown zIndex={999}
-                                onItemSelect={(kitem) => {
-                                  // alert('select dealer')
-                                  console.log('clicked',kitem)
-                                  ite.value = kitem.id
-                                  item.data = kitem
-                                  // console.log('clicked', kitem)
-                                  // setloading(true)
-                                  getrefreshlist()
-                                }}
-
-                                containerStyle={{ padding: 3, width: '100%' }}
-                                onRemoveItem={(item, index) => {
-                                  // const items = selectedCrops.filter((sitem) => sitem.name !== item.name);
-                                  // setselectedDelers(items)
-                                }}
-                                itemStyle={{
-                                  padding: 10,
-                                  marginTop: 2,
-                                  backgroundColor: 'white',
-                                  borderColor: 'silver',
-                                  borderWidth: 1,
-                                  borderRadius: 5,
-                                }}
-                                itemTextStyle={{ color: '#222' }}
-                                itemsContainerStyle={{ maxHeight: 100 }}
-                                items={item.options ? item.options : []}
-                                // defaultIndex={2}
-                                resetValue={false}
-                                textInputProps={
-                                  {
-                                    placeholder: `Search ${FormData[1].value}`,
-                                    underlineColorAndroid: "transparent",
-                                    style: {
-                                      // padding: 8,
-                                      borderWidth: .3,
-                                      borderColor: '#ccc',
-                                      borderRadius: 5,
-                                      color: "black"
-                                    },
-                                    onTextChange: text => {
-                                      console.log(text)
-                                      getfiltersdata(text,FormData[1].value)
-
-                                    }
-                                  }
-                                }
-                                listProps={
-                                  {
-                                    nestedScrollEnabled: true,
-                                  }
-                                }
-                              />
-                            )}
-
-                          </View>
-                      </View>
-                      </View>
-                          </View>
-                        ) : (
-                          <MYinputs item={item} />
-                        )
-                        }
-                      </View>
-
-                    
-
-                  )}
-
-                </View>
-
-
-              )}
-
+              { item.type=='Items'?(<CartScreen item={item} />):(<MYinputs item={item} inputrefresh={getrefreshlist} />) }
             </Pressable>
           )
         }}
-      />
+      /> */}
 
       <Pressable onPress={() => {
         submitForm()
@@ -526,7 +391,7 @@ const QuotationDetailsScreen = ({ navigation, route: {
         </View>
       </Pressable>
 
-      {isUpdate ? (
+      {/* {isUpdate ? (
         <View>
           <Text style={{ fontSize: 15, fontWeight: 700, color: 'black', textAlign: 'center' }}>Comments</Text>
           <TextInput
@@ -575,7 +440,7 @@ const QuotationDetailsScreen = ({ navigation, route: {
         </View>
 
       ) : null
-      }
+      } */}
 
 
 

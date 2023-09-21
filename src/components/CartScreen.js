@@ -220,7 +220,7 @@ const CartScreen = ({ item }) => {
             }}
           />
 
-          <ProductsScreen item={item} cart_productsList={productsList} />
+          <ProductsScreen item={item} cart_productsList={productsList} refreshcart={onRefresh} />
 
 
         </ScrollView>

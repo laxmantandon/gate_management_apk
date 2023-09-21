@@ -9,7 +9,7 @@ import { RNCamera } from 'react-native-camera';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 
 
-const ProductsScreen = ({ item,cart_productsList }) => {
+const ProductsScreen = ({ item,cart_productsList,refreshcart}) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [productsList, setproductsList] = useState([])
     const [loading, setloading] = useState(false)
@@ -191,6 +191,7 @@ useEffect(() => {
     
         getData()
         // getSelectedproducts()
+        refreshcart()
     
       }
     

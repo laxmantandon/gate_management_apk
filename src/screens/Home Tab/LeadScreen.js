@@ -1,5 +1,5 @@
 import { RefreshControl, View, Text, FlatList, SafeAreaView, Pressable, Image, TextInput, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Card from '../../components/Card'
 import mystyles from '../../css/mystyles'
 import { Colors } from '../../contants'
@@ -21,7 +21,7 @@ const LeadScreen = ({ navigation }) => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      setstart_limit(0)
+      setstart_limit(1)
       getData()
       setRefreshing(false);
     }, 1000);
@@ -31,6 +31,8 @@ const LeadScreen = ({ navigation }) => {
     getData()
   }, [])
 
+  
+
 
   const getData = () => {
     
@@ -39,7 +41,6 @@ const LeadScreen = ({ navigation }) => {
       // console.log(resp)
       setloading(false)
       if(resp.data){
-        setstart_limit(start_limit+21)
         mapped_array = ListData
       setresponseData(m?.data)
       resp.data.forEach(a => {
@@ -48,6 +49,8 @@ const LeadScreen = ({ navigation }) => {
         date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
       });
       setListData(mapped_array)
+      setstart_limit(start_limit+21)
+
       }else{
         // setListData([])
       }

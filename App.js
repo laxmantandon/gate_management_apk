@@ -254,7 +254,7 @@ const App = () => {
 
                         <Pressable 
                         onPress={() => { 
-                          navigation.navigate('QrscannerScreeen', Item = {item})
+                          navigation.navigate('QuatationDetailsScreen', Item = {item})
                           // navigation.navigate('AddOpportunityScreen', Item = {item})
                       
                       }}
@@ -307,7 +307,7 @@ const App = () => {
                 headerTitle:()=>{
                   return(<View>
                       {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Opportunity</Text>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Opportunity'?'Update Opportunity':`Add Opportunity From ${item.doctype}`}</Text>
                         <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
                       </View>):(
                       <View>
@@ -398,11 +398,11 @@ const App = () => {
                 headerTitle:()=>{
                   return(<View>
                       {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Quatation</Text>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Quotation'?'Update Quotation':`Add Quotation From ${item.doctype}`}</Text>
                         <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
                       </View>):(
                       <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Quatation</Text>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Quotation</Text>
                     </View>)}
   
                     </View>
