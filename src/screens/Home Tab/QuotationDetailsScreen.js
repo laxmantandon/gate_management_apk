@@ -19,6 +19,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Share from 'react-native-share';
 import { WebView } from 'react-native-webview';
 
+import RNFetchBlob from "rn-fetch-blob";
+
+
 
 
 
@@ -375,32 +378,50 @@ a.read_only=1
     <ScrollView keyboardShouldPersistTaps="handled">
       <Frappe_Model loading={loading} text={loading_text} />
       {/* <Text>QuotationDetailsScreen</Text> */}
-      {/* <WebView source={{ uri: 'https://reactnative.dev/' }} style={{ flex: 1 }} /> */}
+      {/* <WebView source={{ uri: 'https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=SAL-QTN-202300003&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en' }} 
+      style={{ flex: 1, width:'auto', height:350 }} /> */}
 
-      {isUpdate ? <Pressable onPress={() => {
-        navigation.navigate('AddSalesOrderScreen', Item = { item })
-      }} style={{ paddingVertical: 10 }} >
-        <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Make Sales Order</Text>
-      </Pressable> : ''}
+
+      {isUpdate ? 
+      <View>
       <Pressable onPress={() => {
- const options = {
-   title: 'Quotation Whatsapp Message',
-   message: `hi bro`, // Note that according to the documentation at least one of "message" or "url" fields is required
-   url: "https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=SAL-QTN-202300003&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en",
- };
- 
-Share.open(options)
-.then((res) => {
-// console.log(res);
-})
-.catch((err) => {
+        navigation.navigate('AddSalesOrderScreen', Item = { item })
+          }} style={{ paddingVertical: 10 }} >
+            <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Make Sales Order</Text>
+          </Pressable>
 
-});
 
+          <Pressable onPress={() => {
+
+            let dirs = RNFetchBlob.fs.dirs;
+            setloading(true)
+            RNFetchBlob.config({
+              appendExt: "pdf",
+              path: dirs.DocumentDir + `/${item.data.name}.pdf`,
+            })
+              .fetch("GET", `https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=${item.data.name}&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en`, {
+              }).then((res) => {
+                setloading(false)
+
+                // console.log("The file saved t o ", res.path());
+                const options = {
+                  title: 'Quotation Whatsapp Message',
+                  message: `hi bro`, // Note that according to the documentation at least one of "message" or "url" fields is required
+                  url: `file://${res.path()}`,
+                  subject: 'pdf'
+                };
+
+                Share.open(options)
+                  .then((res) => {
+                    // console.log(res);
+                  })
+              });
+
+          }} style={{ paddingVertical: 10 }} >
+            <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Share Quotation</Text>
+          </Pressable>
+      </View> : ''}
       
-      }} style={{ paddingVertical: 10 }} >
-        <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Share Quotation</Text>
-      </Pressable>
 
 {FormData.map(item => {
    return (

@@ -200,9 +200,24 @@ const session_user = async () => {
   };
 
 
+  const get_pdf = async (doctype, docname,format) => {
+    let req=''
+      try {
+        let Response = await AuthRequest.post(
+          `${base_url3}/frappe.utils.print_format.download_pdf?doctype=${doctype}&name=${docname}&format=${format}`,req,headers
+        );
+        return Response?.data;
+      } catch (error) {
+        console.log(error.response.data);
+        console.log(error.response.data._server_messages[0].message);
+        console.log()
+        return {status: false, message: 'Oops! Something went wrong'};
+      }
+    };
 
 
 
 
-export default {base_url, login, reset_password, get_doc, get_list, get_doctype_fields, get_doctype_fields_values, new_doc, set_doc, add_comments, search_links, session_user, get_notifications
+
+export default {base_url,get_pdf, login, reset_password, get_doc, get_list, get_doctype_fields, get_doctype_fields_values, new_doc, set_doc, add_comments, search_links, session_user, get_notifications
 };
