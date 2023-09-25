@@ -12,7 +12,7 @@ const getDoctypeFields = (formdata)=>{
       let keyboard =''
       let link_doctype = ''
       if (a.fieldtype=="Data"){
-        fieldtype='text'
+        // fieldtype='text'
         if (a.options =="Phone"){
           // console.log('Phone Number')
           a.len=10
@@ -99,6 +99,9 @@ const getDoctypeFields = (formdata)=>{
           }
           if(a.read_only){
             p.read_only=a?.read_only
+          }
+          if(a.len){
+            p.len=a?.len
           }
         mapped_array.push(p)
 

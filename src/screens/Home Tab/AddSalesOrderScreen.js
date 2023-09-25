@@ -47,7 +47,7 @@ const AddSalesOrderScreen = ({ navigation, route: {
       let formd = getDoctypeFields(resp)
 
       if (item) {
-        if(item.doctype=='Lead' || item.doctype=='Opportunity'){
+        if(item.doctype=='Quotation'){
           console.log(item)
 
           getDefaultValues(formd)
@@ -83,29 +83,34 @@ const AddSalesOrderScreen = ({ navigation, route: {
 
       if (a.key == 'items') {
         if(item){
-        if(item.doctype=='Opportunity'){
-          // console.log(item.doc)
+        if(item.doctype=='Quotation'){
           a.value=item.doc.items
         }
       }
-       
-        // a.read_only=1
-        // a.type='text'
       }
 
+      // if (a.key == 'selling_price_list') {
+      //   if(item){
+      //   if(item.doctype=='Quotation'){
+      //     a.value=item.selling_price_list
+      //   }
+      // }
+      // }
+
       if (a.key == 'customer') {
-        // if(item){
-        //   if(item.doctype!='Sales Order'){
-        //     a.value=item.data.name
-        //   }
-        // }
+        if(item){
+          if(item.doctype=='Quotation'){
+            a.value=item.data.party_name
+            
+          }
+        }
         if(a.value){
         a.read_only=1
         a.type='text'
         }else{
-          type='searchable'
-          options=[]
-          link_doctype="Customer"
+          a.type='searchable'
+          a.options=[]
+          a.link_doctype="Customer"
         }
       }
 
@@ -236,7 +241,8 @@ const AddSalesOrderScreen = ({ navigation, route: {
             'Succesfully Created',
             ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
           );
-          navigation.goBack()
+          // navigation.goBack()
+          navigation.navigate('SalesOrderScreen')
         } else {
           ToastAndroid.showWithGravityAndOffset(
             'Something Wrong',
@@ -345,8 +351,8 @@ const AddSalesOrderScreen = ({ navigation, route: {
   if(item.key=='customer'){
     if(item.value==''){
       type='searchable'
-  options=[]
-  link_doctype="Customer"
+    options=[]
+    link_doctype="Customer"
     }
   }
    return (

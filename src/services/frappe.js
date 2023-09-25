@@ -29,6 +29,26 @@ const login = async user => {
   }
 };
 
+const reset_password = (email) => {
+  if (!email) {
+    return {status: false, message: 'Please fill up Email field'};
+  }
+  try {
+    let requestBody = {
+      email: email,
+      cmd: 'frappe.core.doctype.user.user.reset_password',
+    };
+    let resetResponse =  AuthRequest.get(
+      `${base_url}`,requestBody
+    );
+    console.log(resetResponse)
+    // return resetResponse?.data.message;
+  } catch (error) {
+    // console.log(error.response.data);
+    return {status: false, message: 'Oops! Something went wrong'};
+  }
+};
+
 const get_doctype_fields = async (doctype) => {
   try {
     let Response = await AuthRequest.get(
@@ -69,6 +89,20 @@ const get_list = async (doctype,filters,fields,start,orderBy) => {
     return Response?.data;
   } catch (error) {
     console.log(error.response.data.exception);
+    return {status: false, message: 'Oops! Something went wrong'};
+  }
+};
+
+
+const get_notifications = async () => {
+  try {
+    let Response = await AuthRequest.get(
+      `${base_url3}/frappe.desk.doctype.notification_log.notification_log.get_notification_logs`,headers
+    );
+
+    return Response?.data;
+  } catch (error) {
+    console.log(error.response.data);
     return {status: false, message: 'Oops! Something went wrong'};
   }
 };
@@ -150,10 +184,25 @@ const search_links = async (req) => {
   }
 };
 
+const session_user = async () => {
+  let req=''
+    try {
+      let Response = await AuthRequest.post(
+        `${base_url3}/frappe.auth.get_logged_user`,req,headers
+      );
+      return Response?.data;
+    } catch (error) {
+      console.log(error.response.data);
+      console.log(error.response.data._server_messages[0].message);
+      console.log()
+      return {status: false, message: 'Oops! Something went wrong'};
+    }
+  };
 
 
 
 
 
-export default {login,  get_doc, get_list,get_doctype_fields, get_doctype_fields_values, new_doc, set_doc, add_comments,search_links
+
+export default {base_url, login, reset_password, get_doc, get_list, get_doctype_fields, get_doctype_fields_values, new_doc, set_doc, add_comments, search_links, session_user, get_notifications
 };

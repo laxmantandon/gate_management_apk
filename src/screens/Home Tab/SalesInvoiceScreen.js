@@ -44,7 +44,7 @@ const SalesInvoiceScreen = ({ navigation }) => {
         let m = JSON.parse(result)
         // console.log(m.data)
         mapped_array = []
-        setresponseData(m?.data)
+        setresponseData(resp?.data)
         m.data.forEach(a => {
           // console.log(a)
           mapped_array.push({data:a, title: a.name, subtitle: `${a.customer_name} (${a?.customer})`, date: a.creation, percent: `Rs.${a.grand_total}`, status: a.status })

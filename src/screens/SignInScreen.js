@@ -30,8 +30,8 @@ import { SuccessToast } from 'react-native-toast-message';
 const SignInScreen = ({navigation}) => {
 
     const [data, setData] = React.useState({
-        username: '9685062116',
-        password: 'Aakamesh@123',
+        username: '',
+        password: '',
         check_textInputChange: false,
         secureTextEntry: true,
         isValidUser: true,
@@ -219,12 +219,12 @@ const SignInScreen = ({navigation}) => {
                 <TextInput 
                     placeholder="Your Username"
                     placeholderTextColor="#666666"
-                    keyboardType="number-pad"
-                    maxLength={9}
+                    keyboardType="default"
+                    // maxLength={10}
                     style={[styles.textInput, {
                         color: colors.text
                     }]}
-                    value='9685062116'
+                    defaultValue=''
                     autoCapitalize="none"
                     onChangeText={(val) => textInputChange(val)}
                     onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
@@ -243,7 +243,7 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidUser ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+            <Text style={styles.errorMsg}>Username must be 10 characters long.</Text>
             </Animatable.View>
             }
             
@@ -265,7 +265,7 @@ const SignInScreen = ({navigation}) => {
                     style={[styles.textInput, {
                         color: colors.text
                     }]}
-                    value='Aakamesh@123'
+                    
                     autoCapitalize="none"
                     onChangeText={(val) => handlePasswordChange(val)}
                 />
@@ -294,7 +294,7 @@ const SignInScreen = ({navigation}) => {
             }
             
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>{navigation.navigate('ResetPasswordScreen')}}>
                 <Text style={{color: Colors.DEFAULT_RED, marginTop:5}}>Forgot password?</Text>
             </TouchableOpacity>
             <View style={styles.button}>
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     },
     text_footer: {
         color: '#05375a',
-        fontSize: 15,
+        fontSize: 14,
         fontWeight:'600',
         paddingLeft:7
     },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.LIGHT_GREY2,
         paddingBottom: 0,
         padding:10,
-        borderRadius:15,
+        borderRadius:10,
         backgroundColor:'white',
         elevation:2,
         

@@ -79,7 +79,7 @@ const Card = ({ item }) => {
           </View>
           ) : ('')}
 
-          <View style={styles.detailContainer}>
+          <View style={[styles.detailContainer,{width:data?.status?'60%':'auto'}]}>
             <View style={styles.titleContainer}>
               <Text style={styles.listListTitle} numberOfLines={1}>
                 {data?.title}

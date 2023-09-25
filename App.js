@@ -45,6 +45,7 @@ import QuotationScreen from './src/screens/Home Tab/QuotationScreen';
 import QuatationDetailsScreen from './src/screens/Home Tab/QuotationDetailsScreen';
 import SalesOrderScreen from './src/screens/Home Tab/SalesOrderScreen';
 import AddSalesOrderScreen from './src/screens/Home Tab/AddSalesOrderScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 // import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const Drawer = createDrawerNavigator();
@@ -199,7 +200,7 @@ const App = () => {
                   
                   headerRight: () => {
                   return (
-                    <Pressable  onPress={() => { navigation.navigate('AddLead', Item = '') }} style={{ flexDirection: 'row' }}>
+                    <Pressable  onPressIn={() => { navigation.navigate('AddLead', Item = '') }} style={{ flexDirection: 'row' }}>
                       <View style={{ paddingHorizontal: 1 }}>
                         <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
                       </View>
@@ -240,7 +241,7 @@ const App = () => {
                       {item?(
                        <View>
                          <Pressable 
-                        onPress={() => { 
+                        onPressIn={() => { 
                           // navigation.navigate('QrscannerScreeen', Item = {item})
                           navigation.navigate('AddOpportunityScreen', Item = {item})
                       
@@ -253,7 +254,7 @@ const App = () => {
                         </Pressable>
 
                         <Pressable 
-                        onPress={() => { 
+                        onPressIn={() => { 
                           navigation.navigate('QuatationDetailsScreen', Item = {item})
                           // navigation.navigate('AddOpportunityScreen', Item = {item})
                       
@@ -284,7 +285,7 @@ const App = () => {
                 
                 headerRight: () => {
                   return (
-                     <Pressable  onPress={() => { navigation.navigate('AddOpportunityScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <Pressable  onPressIn={() => { navigation.navigate('AddOpportunityScreen', Item = '') }} style={{ flexDirection: 'row' }}>
                      <View style={{ paddingHorizontal: 1 }}>
                        <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
                      </View>
@@ -323,7 +324,7 @@ const App = () => {
                       <View>
                         {/* {item?(
                           <Pressable 
-                          onPress={() => { 
+                          onPressIn={() => { 
                             navigation.navigate('QrscannerScreeen', Item = {item}) 
                             // navigation.navigate('QuatationDetailsScreen', Item = {item}) 
                           }}
@@ -346,7 +347,7 @@ const App = () => {
                     <View style={{ flexDirection: 'row' }}>
                       <View style={{ paddingHorizontal: 5 }}>
                         <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE}
-                          onPress={() => { navigation.navigate('AddSalesInvoiceScreen', Item = '') }} ></Icon>
+                          onPressIn={() => { navigation.navigate('AddSalesInvoiceScreen', Item = '') }} ></Icon>
                       </View>
 
                     </View>
@@ -363,6 +364,7 @@ const App = () => {
 
               <stack.Screen name="TaskScreen" component={TaskScreen} />
               <stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
+              <stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
 
 
               <stack.Screen name="QuatationScreen" component={QuotationScreen} options={({ navigation }) => ({
@@ -378,7 +380,7 @@ const App = () => {
                 
                 headerRight: () => {
                   return (
-                     <Pressable  onPress={() => { navigation.navigate('QuatationDetailsScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <Pressable  onPressIn={() => { navigation.navigate('QuatationDetailsScreen', Item = '') }} style={{ flexDirection: 'row' }}>
                      <View style={{ paddingHorizontal: 1 }}>
                        <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
                      </View>
@@ -414,7 +416,7 @@ const App = () => {
                       <View>
                         {item?(
                           <Pressable 
-                          onPress={() => { 
+                          onPressIn={() => { 
                             // navigation.navigate('QrscannerScreeen', Item = {item}) 
                         }}
                            style={{ flexDirection: 'row' }}>
@@ -442,7 +444,7 @@ const App = () => {
                 
                 headerRight: () => {
                   return (
-                     <Pressable  onPress={() => { navigation.navigate('AddSalesOrderScreen', Item = '') }} style={{ flexDirection: 'row' }}>
+                     <Pressable  onPressIn={() => { navigation.navigate('AddSalesOrderScreen', Item = '') }} style={{ flexDirection: 'row' }}>
                      <View style={{ paddingHorizontal: 1 }}>
                        <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
                      </View>
@@ -462,7 +464,7 @@ const App = () => {
                 headerTitle:()=>{
                   return(<View>
                       {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Sales Order</Text>
+                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Sales Order'?'Update Quotation':`Add Sales Order From ${item.doctype}`}</Text>
                         <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
                       </View>):(
                       <View>
@@ -478,7 +480,7 @@ const App = () => {
                       <View>
                         {item?(
                           <Pressable 
-                          onPress={() => { 
+                          onPressIn={() => { 
                             // navigation.navigate('QrscannerScreeen', Item = {item}) 
                         }}
                            style={{ flexDirection: 'row' }}>

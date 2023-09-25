@@ -143,7 +143,7 @@ useEffect(() => {
     const getData = () => {
       setTimeout(() => {
         setloading(false)
-        clearTimeout();
+        // clearTimeout();
       }, 100)
     }
 
@@ -247,7 +247,7 @@ useEffect(() => {
                 animationType="slide"
                 transparent={true}
                 onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
+                    // Alert.alert('Modal has been closed.');
                     setModalVisible(!modalVisible);
                 }}>
           <View style={{ backgroundColor: 'white', flex: 1, }}>
@@ -315,6 +315,7 @@ useEffect(() => {
                     </Pressable>
                   )
                 }}
+                
   
               />
             </View>
@@ -360,6 +361,7 @@ useEffect(() => {
                  <Icon name="scan-circle-outline" size={30} color={"white"} />
                </Pressable>
              </View>
+             
 
              <FlatList
                refreshing={loading}
@@ -379,6 +381,13 @@ useEffect(() => {
                    </View>
                  )
                }}
+               ListFooterComponent={()=>{
+                return(
+                  <View style={{padding:200}}>
+                    <Text> END OF List</Text>
+                    </View>
+                )
+              }}
              />
              <Pressable
                onPressIn={() => {

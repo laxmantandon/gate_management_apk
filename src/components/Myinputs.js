@@ -30,9 +30,13 @@ const MYinputs = ({ item,inputrefresh }) => {
 
 
   useEffect(() => {
-    if(item?.link_doctype){
+    if(item?.type=='select'){
       getLinkedDoctype('a')
-      // getfiltersdata()
+    }
+
+    if(item.type=='searchable'){
+      getfiltersdata('y')
+      refreshGetData()
     }
 
   }, [])
@@ -130,38 +134,37 @@ const [multi_value, setmulti_value] = useState([])
   }
 const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
   const getLinkedDoctype = (text) => {
-if(item.options.length >0){
+// if(item.options.length >0){
 
-}else{
+// }else{
 
     
     frappe.get_list(item.link_doctype,filters=[[item.link_doctype,"name","like",`%${text}%` ]], fields=["name"]).then(result => {
         // console.log('select search data', result)
         // item.options=[]
         let mdata = result
-        mapped_data=[]
-        mdata.data.forEach(a => {
-          let mapped=[]
-          
-            if (a.name){
-              mapped_data=a
-              setLinkedDoctypeData(mapped_data)
-              mapped.push(a.name)
-            }
-            item.options = mapped
-
-            console.log(item.options)
-
-        });
+        // mapped_data=[]
+        // mdata.data.forEach(a => {
+        //   let mapped=[]
+        //     if (a.name){
+        //       mapped_data=a
+        //       setLinkedDoctypeData(mapped_data)
+        //       mapped.push(a.name)
+        //     }
+        // });
+        // item.options = mapped
+        // console.log(item.options)
 
         // let m = JSON.parse(result)
         // // console.log(m.data)
-        // mapped_array = []
+        mapped_array = []
         // setresponseData(m?.data)
-        // m.data.forEach(a => {
-        //   // console.log(a)
-        //   mapped_array.push({data:a, title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, date: a.creation, whatsapp: a.whatsapp_no, call: a.mobile_no })
-        // });
+        mdata.data.forEach(a => {
+          // console.log(a)
+          mapped_array.push(a.name)
+        });
+        item.options = mapped_array
+
         // setListData(mapped_array)
 
 
@@ -169,7 +172,7 @@ if(item.options.length >0){
       })
       .catch(error => console.log('error', error));
 
-    }
+    // }
   }
   const [read_only, setread_only] = useState(item?.read_only?'none':'auto')
   // const [read_only, setread_only] = useState(item?.read_only?'auto':'auto')
@@ -216,14 +219,15 @@ if(item.options.length >0){
 
       // frappe.search_links(req).then((result)=>{
       frappe.get_list(item.link_doctype,filters={"name":["like",`%${text}%` ]}, fields=["name"]).then(result => {
-
         console.log(result)
-        mapped=[]
+        if(result.data){
+          mapped=[]
         result.data.forEach(a => {
           mapped.push({'name':a.name,'id':a.name})
         });
         item.options=mapped
         console.log(item.options)
+        }
       })
     }  
     // onRefresh  
@@ -422,7 +426,7 @@ if(item.options.length >0){
                                       }
                               }}
                               defaultValue={item.value}
-                              defaultValueByIndex={0}
+                              // defaultValueByIndex={0}
                               defaultButtonText={item?.label}
                               buttonStyle={{
                                 backgroundColor: 'white',
@@ -541,7 +545,7 @@ if(item.options.length >0){
                                     borderRadius: 5,
                                   }}
                                   itemTextStyle={{ color: '#222' }}
-                                  itemsContainerStyle={{ maxHeight: 140 }}
+                                  itemsContainerStyle={{ maxHeight: 200 }}
                                   items={item.options?item.options:[]}
                                   // defaultIndex={2}
                                   resetValue={false}
@@ -585,7 +589,7 @@ if(item.options.length >0){
                                     open={open}
                                     date={item?.value? moment(item?.value).toDate() :moment().toDate()}
                                     onConfirm={text => {
-                                      item.value =  moment(new Date(text)).format('YY-MM-DD')
+                                      item.value =  moment(new Date(text)).format('yyyy-MM-DD')
                                       console.log(item.value)
                                       setOpen(false)
                                     }}

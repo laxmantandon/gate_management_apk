@@ -16,6 +16,11 @@ import SearchableDropDown from 'react-native-searchable-dropdown'
 import Icon from 'react-native-vector-icons/Ionicons'
 import SelectDropdown from 'react-native-select-dropdown'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Share from 'react-native-share';
+import { WebView } from 'react-native-webview';
+
+
+
 
 
 
@@ -95,8 +100,11 @@ const QuotationDetailsScreen = ({ navigation, route: {
 
       if (a.key == 'party_name') {
         if(item){
-          if(item.doctype!='Quotation'){
+          if(item.doctype=='Lead'){
             a.value=item.data.name
+          }
+          if(item.doctype=='Opportunity'){
+            a.value=item.data.party_name
           }
         }
         if(a.value){
@@ -121,8 +129,12 @@ a.read_only=1
       }
       if (a.key == 'quotation_to') {
         if(item){
-          if(item.doctype!='Quotation'){
+          if(item.doctype=='Lead'){
             a.value=item.doctype
+          }
+          if(item.doctype=='Opportunity'){
+            console.log('quatation to',item.data.opportunity_from)
+            a.value=item.data.opportunity_from
           }
         }
         if(a.value) {
@@ -180,6 +192,7 @@ a.read_only=1
     frappe.get_doctype_fields_values('Quotation', item.data.name).then((resp1) => {
       setdoc(resp1.docs[0])
       formd = SetFieldsValue(formd, resp1.docs[0])
+      item.doc=resp1.docs[0]
       getDefaultValues(formd)
     })
     setFormData(formd)
@@ -233,16 +246,25 @@ a.read_only=1
       })
 
     } else {
+      frappe.get_list('Company',filters={}, fields=["*"]).then((res)=>{
+        // console.log(res)
+        // setloading(false)
+        if(res.data){
+          res.data[0]
+          req.company_name=res.data[0].company_name
+          req.company_gstin=res.data[0].gstin
+
+        
 
       frappe.new_doc('Quotation', req).then((result) => {
-        // console.log('result',result)
+        console.log('req',req)
         setloading(false)
         if (result.data) {
           ToastAndroid.showWithGravityAndOffset(
             'Succesfully Created',
             ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
           );
-          navigation.goBack()
+          navigation.navigate('QuatationScreen')
         } else {
           ToastAndroid.showWithGravityAndOffset(
             'Something Wrong',
@@ -256,6 +278,9 @@ a.read_only=1
           ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
         );
       })
+    }
+
+    })
 
     }
 
@@ -350,13 +375,32 @@ a.read_only=1
     <ScrollView keyboardShouldPersistTaps="handled">
       <Frappe_Model loading={loading} text={loading_text} />
       {/* <Text>QuotationDetailsScreen</Text> */}
+      {/* <WebView source={{ uri: 'https://reactnative.dev/' }} style={{ flex: 1 }} /> */}
 
       {isUpdate ? <Pressable onPress={() => {
-        navigation.navigate('QrscannerScreeen', Item = { item })
+        navigation.navigate('AddSalesOrderScreen', Item = { item })
       }} style={{ paddingVertical: 10 }} >
         <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Make Sales Order</Text>
       </Pressable> : ''}
+      <Pressable onPress={() => {
+ const options = {
+   title: 'Quotation Whatsapp Message',
+   message: `hi bro`, // Note that according to the documentation at least one of "message" or "url" fields is required
+   url: "https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=SAL-QTN-202300003&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en",
+ };
+ 
+Share.open(options)
+.then((res) => {
+// console.log(res);
+})
+.catch((err) => {
 
+});
+
+      
+      }} style={{ paddingVertical: 10 }} >
+        <Text style={{ textAlign: 'center', color: Colors.DEFAULT_BLUE, fontWeight: 'bold' }}> + Share Quotation</Text>
+      </Pressable>
 
 {FormData.map(item => {
    return (

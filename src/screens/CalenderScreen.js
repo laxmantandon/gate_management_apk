@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, StatusBar } from 'react-native';
 import { Agenda } from 'react-native-calendars';
@@ -44,10 +45,10 @@ const CalenderScreen = () => {
   const renderItem = (item) => {
     return (
       <TouchableOpacity style={styles.item}>
-        <Card>
-          <Card.Content>
+        <Card style={{backgroundColor:'white'}}>
+          <Card.Content >
             <View>
-              <Text>{item.name}</Text>
+              <Text style={{fontSize:12, color:'black'}}>{item.name}</Text>
             </View>
           </Card.Content>
         </Card>
@@ -58,9 +59,10 @@ const CalenderScreen = () => {
   return (
     <View style={styles.container}>
       <Agenda
+     headerStyle={{color:'blue'}}
         items={items}
         loadItemsForMonth={loadItems}
-        selected={'2023-08-29'}
+        selected={moment().format('yy-MM-DD')}
         refreshControl={null}
         showClosingKnob={true}
         refreshing={false}
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
-    marginTop: 17
+    marginTop: 17,
   },
 });
 

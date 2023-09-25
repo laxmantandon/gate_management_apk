@@ -8,6 +8,7 @@ import FabButton from '../../components/FabButton'
 import Icon from 'react-native-vector-icons/Ionicons';
 import Frappe_Model from '../Frappe_Model'
 import frappe from '../../services/frappe'
+import AsyncStorage from '@react-native-community/async-storage'
 
 
 const LeadScreen = ({ navigation }) => {
@@ -17,44 +18,50 @@ const LeadScreen = ({ navigation }) => {
   const [loading, setloading] = useState(false)
   const [start_limit, setstart_limit] = useState(0)
   const [refreshing, setRefreshing] = React.useState(false);
+  const [user, setuser] = useState()
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      setstart_limit(1)
+      setstart_limit(0)
       getData()
       setRefreshing(false);
     }, 1000);
   }, []);
 
   useEffect(() => {
-    getData()
+    // getData()
+    AsyncStorage.getItem('user_info').then((muser)=>{
+      console.log(muser)
+      setuser(JSON.parse(muser))
+    })
   }, [])
 
   
 
 
   const getData = () => {
-    
     setloading(true)
-    frappe.get_list('Lead',filters={'modified_by':'kamesh@erevive.in'}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Lead',filters=[["Lead","_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
-        mapped_array = ListData
-      setresponseData(m?.data)
+        let mapped_array = []
+        if(ListData.length>20){
+          setstart_limit(start_limit+21)
+          mapped_array= ListData
+        }
+
+      setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
         mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
         date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
       });
       setListData(mapped_array)
-      setstart_limit(start_limit+21)
-
       }else{
         // setListData([])
       }
-
     }).catch(error =>{
          setloading(false)
          console.log('error', error)
@@ -73,7 +80,7 @@ const LeadScreen = ({ navigation }) => {
       if(resp.data){
         setstart_limit(start_limit+21)
         mapped_array = start_limit?ListData:[]
-      setresponseData(m?.data)
+      setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
         mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 

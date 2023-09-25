@@ -10,8 +10,6 @@
 ```sh
 # navigate to app directory
 
-
-
 npm install
 ```
 ### 3. Build Android APK

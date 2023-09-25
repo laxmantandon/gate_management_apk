@@ -36,13 +36,13 @@ const OpportunityScreen = ({ navigation }) => {
   const getData = () => {
     
     setloading(true)
-    frappe.get_list('Opportunity',filters={'modified_by':'kamesh@erevive.in'}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Opportunity',filters=[["_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
         setstart_limit(start_limit+21)
         mapped_array = start_limit?ListData:[]
-      setresponseData(m?.data)
+      setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
         mapped_array.push({data:a, doctype:'Opportunity', title: a.name, subtitle: `${a.customer_name}`, 
@@ -71,7 +71,7 @@ const OpportunityScreen = ({ navigation }) => {
       if(resp.data){
         setstart_limit(start_limit+21)
         mapped_array = ListData
-      setresponseData(m?.data)
+      setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
         mapped_array.push({data:a, doctype:'Opportunity', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
