@@ -37,7 +37,7 @@ const AddSalesInvoiceScreen = ({navigation,  route: {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/method/frappe.desk.form.load.getdoc?doctype=Sales%20Invoice&name=${item.data.name}`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/method/frappe.desk.form.load.getdoc?doctype=Sales%20Invoice&name=${item.data.name}`, requestOptions)
       .then(response => response.text())
       .then(result =>{
         let v= JSON.parse(result)
@@ -75,7 +75,7 @@ const AddSalesInvoiceScreen = ({navigation,  route: {
       redirect: 'follow'
     };
     
-    fetch("https://dbh.erevive.cloud/api/method/frappe.desk.form.load.getdoctype?doctype=Sales Order", requestOptions)
+    fetch("https://erp.etplraipur.com/api/method/frappe.desk.form.load.getdoctype?doctype=Sales Order", requestOptions)
       .then(response => response.text())
       .then(result =>{ 
         let v= JSON.parse(result)
@@ -212,7 +212,7 @@ var requestOptions = {
   redirect: 'follow'
 };
 console.log(requestOptions)
-fetch("https://dbh.erevive.cloud/api/resource/Sales Order", requestOptions)
+fetch("https://erp.etplraipur.com/api/resource/Sales Order", requestOptions)
   .then(response => response.text())
   .then(result => console.log(result))
   .catch(error => console.log('error', error));

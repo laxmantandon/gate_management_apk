@@ -36,7 +36,7 @@ useEffect(() => {
           redirect: 'follow'
         };
         
-        fetch(`https://dbh.erevive.cloud/api/resource/Item?filters=[["Item","item_name","like","%${text}%"]]&fields=["*"]`, requestOptions)
+        fetch(`https://erp.etplraipur.com/api/resource/Item?filters=[["Item","item_name","like","%${text}%"]]&fields=["*"]`, requestOptions)
           .then(response => response.text())
           .then(result =>{ 
             let v= JSON.parse(result)
@@ -44,7 +44,7 @@ useEffect(() => {
             mapped_array = []
             v.data.forEach(a => {
                 // console.log(a)
-                let p ={"image":`https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+                let p ={"image":`https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
                 "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name, "qty": 0, 
                 "status": 'Add to Cart', "percent": 0, "item_code": a.name ,'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp }
 
@@ -76,7 +76,7 @@ useEffect(() => {
         redirect: 'follow'
       };
       
-      fetch(`https://dbh.erevive.cloud/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
+      fetch(`https://erp.etplraipur.com/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
         .then(response => response.text())
         .then(result =>{ 
           let v= JSON.parse(result)
@@ -98,7 +98,7 @@ useEffect(() => {
               }
 
               mapped_array = {
-                "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+                "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
                 "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
                 "qty": a.qty?a.qty:0, "status": 'Add to Cart', "percent": a.qty?a.qty:0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
               }
@@ -120,7 +120,7 @@ useEffect(() => {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/resource/Item?fields=["*"]`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/resource/Item?fields=["*"]`, requestOptions)
       .then(response => response.text())
       .then(result => {
         let v = JSON.parse(result)
@@ -128,7 +128,7 @@ useEffect(() => {
         let mapped_array = []
         v.data.forEach(a => {
           mapped_array.push({
-            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
             "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
             "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
           })

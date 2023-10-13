@@ -1,4 +1,4 @@
-import { RefreshControl, View, Text, FlatList, SafeAreaView, Pressable, Image, TextInput, ScrollView } from 'react-native'
+import { RefreshControl, View, Text, FlatList, SafeAreaView, Pressable, Image, TextInput, ScrollView, ToastAndroid, StatusBar, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import Card from '../../components/Card'
 import mystyles from '../../css/mystyles'
@@ -9,9 +9,14 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Frappe_Model from '../Frappe_Model'
 import frappe from '../../services/frappe'
 import AsyncStorage from '@react-native-community/async-storage'
+import SearchBoxScreen from '../FormScreens/SearchBoxScreen'
+import moment from 'moment'
+import { AuthContext } from '../../components/context'
 
 
-const LeadScreen = ({ navigation }) => {
+const LeadScreen = ({ navigation, doc_name}) => {
+  const { signOut } = React.useContext(AuthContext);
+
   const [ListData, setListData] = useState([])
   const [ScreensData, setScreensData] = useState([])
   const [responseData, setresponseData] = useState([])
@@ -19,44 +24,99 @@ const LeadScreen = ({ navigation }) => {
   const [start_limit, setstart_limit] = useState(0)
   const [refreshing, setRefreshing] = React.useState(false);
   const [user, setuser] = useState()
+  const [user_role, setuser_role] = useState('gatekeeper')
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setstart_limit(0)
+  const [searchInput, setsearchInput] = useState({title:'', parent:'Gate Entry', link_doctype:'Gate Entry', options:[]})
+
+  // const onRefresh = React.useCallback(() => {
+  //   setRefreshing(true);
+  //   setTimeout(() => {
+  //     setstart_limit(0)
+  //     getData()
+  //     setRefreshing(false);
+  //   }, 1000);
+  // }, []);
+
+  React.useCallback(() => {
+    
       getData()
-      setRefreshing(false);
-    }, 1000);
+      
   }, []);
-
   useEffect(() => {
-    // getData()
+    // console.log(doc_name)
+    getData()
+    Checkuser()
     AsyncStorage.getItem('user_info').then((muser)=>{
-      console.log(muser)
+      // console.log(muser)
       setuser(JSON.parse(muser))
     })
   }, [])
 
-  
+  const Checkuser = () => {
+    setloading(true)
+    frappe.session_user().then((result) => {
+      // console.log(result)
 
+      if (result.message) {
+        let mpe =result.message
+        console.log(mpe)
+        if(mpe.includes('logistics')){
+          setuser_role('logistics')
+        }
+        
+        frappe.get_list('User', filters = { 'name': result.message }, fields = ["*"]).then((muser) => {
+          // console.log(muser)
+          // console.log(muser.data[0].roles)
+
+          if (muser.data) {
+            setloading(false)
+            AsyncStorage.setItem('user_info', JSON.stringify(muser.data[0])).then((e) => {
+              setuser(muser.data[0])
+            })
+          } else {
+            setloading(false)
+            AsyncStorage.clear()
+            signOut()
+
+            ToastAndroid.showWithGravityAndOffset(
+              'Employee not found',
+              ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+            );
+          }
+
+        })
+      } else {
+        setloading(false)
+        signOut()
+        ToastAndroid.showWithGravityAndOffset(
+          'Something Wrong Please Check',
+          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+        );
+      }
+
+    })
+
+
+
+  }
 
   const getData = () => {
     setloading(true)
-    frappe.get_list('Lead',filters=[["Lead","_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Gate Entry',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
         let mapped_array = []
-        if(ListData.length>20){
-          setstart_limit(start_limit+21)
-          mapped_array= ListData
-        }
+        // if(ListData.length>50){
+        //   setstart_limit(start_limit+51)
+        //   mapped_array= ListData
+        // }
 
       setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
-        mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
-        date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
+        mapped_array.push({data:a, doctype:'Gate Entry', title: a.name, subtitle:`Vehicle No. - ${a.vehicle_number} `, 
+        date: a.creation, status:'In-Out Time', percent:`${moment(a.creation).format('hh:mm')} - ${a.out_time?moment(a.out_time).format('hh:mm'):'00:00'}`})
       });
       setListData(mapped_array)
       }else{
@@ -68,23 +128,19 @@ const LeadScreen = ({ navigation }) => {
       });
   }
 
-
-  
-
-
-  const searchFilterFunction = (text) => {
-    setloading(true)
-    frappe.get_list('Lead',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
-      // console.log(resp)
-      setloading(false)
+   function searchFilterFunction(){
+    // setloading(true)
+    console.log(searchInput)
+    frappe.get_list('Gate Entry',filters={'name':searchInput.value}, fields=["*"],start=start_limit).then((resp)=>{
+      console.log(resp)
+      // setloading(false)
       if(resp.data){
-        setstart_limit(start_limit+21)
-        mapped_array = start_limit?ListData:[]
+        mapped_array = []
       setresponseData(resp?.data)
       resp.data.forEach(a => {
         // console.log(a)
-        mapped_array.push({data:a, doctype:'Lead', title: a.name, subtitle: `${a.first_name} ${a?.last_name ? a?.last_name : ''}`, 
-        date: a.creation, whatsapp: a.whatsapp_no?a.whatsapp:a.mobile_no, call: a.mobile_no })
+        mapped_array.push({data:a, doctype:'Gate Entry', title: a.name, subtitle:`Vehicle No. - ${a.vehicle_number} `, 
+        date: a.creation, status:'In-Out Time', percent:`${moment(a.creation).format('hh:mm')} - ${a.out_time?moment(a.out_time).format('hh:mm'):'00:00'}`})
       });
       setListData(mapped_array)
       }else{
@@ -92,59 +148,117 @@ const LeadScreen = ({ navigation }) => {
       }
 
     }).catch(error =>{
-         setloading(false)
+        //  setloading(false)
          console.log('error', error)
       });
-
   }
 
+  const CloseEntry=(g_item)=>{
+    let req={
+      name:g_item.data.name,
+      out_time: moment(new Date()).format('yy-MM-DD hh:mm:ss')
+    }
+    console.log(req)
+    frappe.set_doc('Gate Entry',req).then((result)=>{
+      if(result.data){
+        ToastAndroid.showWithGravityAndOffset(
+          'Succesfully Updated',
+          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+        );
+      }else{
+        ToastAndroid.showWithGravityAndOffset(
+          'Something Wrong',
+          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+        );
+      }
+
+    }).catch((e)=>{
+      ToastAndroid.showWithGravityAndOffset(
+        'Something Wrong',
+        ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+      );
+    })
+  }
 
   return (
     <SafeAreaView>
+       <StatusBar
+        animated={true}
+        barStyle={'dark-content'}
+        backgroundColor={'white'}
+        showHideTransition={'fade'}
+      />
             <Frappe_Model loading={loading} text={''} />
+            <View style={{padding:8, flexDirection:'row', borderBottomColor:'silver',borderBottomWidth:.5}}>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Gate Entry</Text>
+                           <Pressable
+                      onPressIn={() => { 
+                      Alert.alert('Confirm ','Do you want to logout',[
+                        {
+                          text: 'Cancel',
+                          onPress: () => null,
+                          style: 'cancel',
+                        },
+                        { text: 'LOG OUT', onPress: () =>{signOut()} },
+                      ]); 
+                    }} style={{ flexDirection: 'row', marginLeft:'auto' }}>
+                      <View style={{ paddingHorizontal: 1 }}>
+                        <Icon name="power-outline" size={25} color={Colors.DEFAULT_RED} style={{fontWeight:'bold'}}></Icon>
+                      </View>
+                      {/* <Text style={{color:Colors.DEFAULT_RED, fontSize:12, fontWeight:'bold'}}> Log Out</Text> */}
 
-      <ScrollView refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={[mstyle.inputContainer, { marginTop: 10, width: '83%', elevation: 2 }]}>
-            <View style={mstyle.inputSubContainer}>
-              <TextInput
-                placeholder={'Type something'}
-                placeholderTextColor={Colors.DEFAULT_GREY}
-                selectionColor={Colors.DEFAULT_GREY}
-                style={mstyle.inputText}
-                onChangeText={text => {
-                  searchFilterFunction(text)
-                }}
-              />
-            </View>
-          </View>
+                    </Pressable>
 
-          <View style={{
-            marginTop: 10, marginRight: 15, marginLeft: 'auto', backgroundColor: Colors.DEFAULT_BLUE, justifyContent: 'center',
-            borderColor: 'gray', borderWidth: .5, borderRadius: 5, paddingHorizontal: 5
-          }}>
-            <Icon name="filter" size={25} color={"white"} />
-          </View>
-        </View>
-
+                  </View>
+      <ScrollView 
+      refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={getData} />
+        }
+        >
+        {/* <View style={{ flexDirection: 'row' }}> */}
+         
+            <SearchBoxScreen item={searchInput} inputrefresh={searchFilterFunction} />
+        
 
         <FlatList
+        onRefresh={()=>{getData()}}
+        refreshing={refreshing}
           data={ListData}
+          style={{paddingBottom:100}}
           // inverted
           numColumns={1}
           renderItem={(item) => {
             return (
-              <Pressable onPress={() => { 
+              <Pressable
+
+              onLongPress={()=>{
+                if(!item.item.data.out_time ){
+                Alert.alert('Confirm!', 'Do You Wants To Close Gate Entry',
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel',
+                  },
+                  { text: 'YES', onPress: () => CloseEntry(item.item) },
+                ]);
+              }
+              }}
+              
+              
+              
+              onPressIn={() => { 
+                console.log(user_role)
+                if(!item.item.data.out_time && user_role=='logistics'){
                 navigation.navigate('AddLead',item=item)
+                }
                  }}>
                 <Card item={item} />
               </Pressable>
             )
           }}
-          onEndReachedThreshold={0.2}
-          onEndReached={()=>{getData()}}
+          // onEndReachedThreshold={0.5}
+          // onEndReached={searchInput.value?'': getData}
 
           ListEmptyComponent={()=>{
             return(
@@ -152,7 +266,7 @@ const LeadScreen = ({ navigation }) => {
                 <Image source={require('../../assets/img/empty.jpg')} style={{ height:250, width:'100%'}}/>
 
                 <Pressable style={{ borderRadius:12, padding:12, borderWidth:1, borderColor:Colors.DEFAULT_BLUE }}
-                 onPress={()=>{
+                 onPressIn={()=>{
                   getData()
                 }}>
                   <Text style={{fontSize:12, fontWeight:'bold', color:Colors.DEFAULT_BLUE, textAlign:'center'}}> Refresh Now</Text>
@@ -163,10 +277,10 @@ const LeadScreen = ({ navigation }) => {
           }}
         />
       </ScrollView>
-      {/* <Pressable onPress={() => { navigation.navigate('AddLead') }} >
+      <Pressable onPressIn={() => { navigation.navigate('AddLead',item={}) }} >
         <FabButton />
 
-      </Pressable> */}
+      </Pressable>
     </SafeAreaView>
   )
 }

@@ -66,8 +66,9 @@ const NotificationScreen = ({navigation}) => {
                   <Text style={{fontWeight:'bold'}}> {item.item.data.for_user}</Text> </Text> */}
                 <Text style={{ color:'black',fontWeight:'bold', fontSize:12}}> Created at {moment(item.item.datetime).format('DD MMM-yy hh:mm a')}</Text>
                 <Pressable onPress={()=>{
+                  console.log(item)
                   if(item.item.data?.document_type){
-                    navigation.navigate(`${item.item?.data.document_type.replace(' ',"")}Screen`,doc_name=item.item?.data.document_name)
+                    navigation.navigate(`${item.item?.data.document_type.replace(' ',"")}Screen`,item={item})
                     } }}>
                   <Card item={item} />
                 </Pressable>

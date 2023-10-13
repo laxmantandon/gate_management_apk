@@ -27,7 +27,7 @@ const TableInput = ({item}) => {
           redirect: 'follow'
         };
         
-        fetch(`https://dbh.erevive.cloud/api/method/frappe.desk.form.load.getdoctype?doctype=${item?.link_doctype}`, requestOptions)
+        fetch(`https://erp.etplraipur.com/api/method/frappe.desk.form.load.getdoctype?doctype=${item?.link_doctype}`, requestOptions)
           .then(response => response.text())
           .then(result =>{ 
             let v= JSON.parse(result)

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image, Pressable, Alert, ActivityIndicator, Modal } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, FlatList, ScrollView, StatusBar, Image, Pressable, Alert, ActivityIndicator, Modal, ToastAndroid } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Feather from 'react-native-vector-icons/Feather'
@@ -125,6 +125,8 @@ const HomeScreen = ({ navigation }) => {
             })
           } else {
             setloading(false)
+            AsyncStorage.clear()
+            signOut()
 
             ToastAndroid.showWithGravityAndOffset(
               'Employee not found',

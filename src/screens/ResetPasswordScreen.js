@@ -37,9 +37,38 @@ const resetpass=()=>{
     if(!email){
         Alert.alert('Alert!','Enter Valid Email')
     }else{
-        frappe.reset_password(email).then((res)=>{
-            console.log(res)
-        })
+    //    frappe.reset_password(email).then((resp)=>{
+    //     console.log(resp)
+    //    })
+    var myHeaders = new Headers();
+    myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_image=");
+    
+    var raw = "";
+    
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+    
+    fetch(`${frappe.base_url}api/method/frappe.core.doctype.user.user.reset_password?user=${email}`, requestOptions)
+      .then(response => response.text())
+      .then(result => {console.log(result)
+        let res= JSON.parse(result)
+        if(res.message){
+Alert.alert('Message',res.message)
+        }
+        if(res._server_messages){
+            console.log(res._server_messages)
+            // let e =JSON.parse(res._server_messages)
+            // console.log(e[0].message)
+            // let er=e[0]
+            Alert.alert('Error',`${res._server_messages}`)
+        }
+    
+    })
+      .catch(error => console.log('error', error));
     }
 }
 
@@ -58,10 +87,10 @@ const resetpass=()=>{
             {/* </View> */}
 
             <View style={styles.header}>
-                <Text style={[styles.text_header,{color:'red'}]}>Reset Password!</Text>
+                <Text style={[styles.text_header,{color:'red', textAlign:'center'}]}>Reset Password!</Text>
             </View>
 
-            <View style={{ justifyContent: 'center' }}>
+            <View style={{ }}>
 
                 <Text style={[styles.text_footer, {
                     color: Colors.DEFAULT_BLUE
@@ -70,19 +99,18 @@ const resetpass=()=>{
                     <FontAwesome
                         name="user-o"
                         color={colors.text}
-                        size={20}
+                        size={15}
                     />
                     <TextInput
                         placeholder="Your username or e-mail"
                         placeholderTextColor="#666666"
                         keyboardType="default"
-                        maxLength={100}
                         style={[styles.textInput, {
                             color: colors.text
                         }]}
                         autoCapitalize="none"
-                        // onChangeText={(val) => textInputChange(val)}
-                        onEndEditing={(e) => setemail(e.nativeEvent.text)}
+                        onChangeText={(val) => setemail(val)}
+                        // onEndEditing={(e) => setemail(e.nativeEvent.text)}
                     />
                     {/* {data.check_textInputChange ?
                         <Animatable.View
@@ -99,7 +127,7 @@ const resetpass=()=>{
 
 
                 <TouchableOpacity onPress={() => { navigation.navigate('ResetPasswordScreen') }}>
-                    <Text style={{ color: Colors.DEFAULT_BLUE, margin: 5,fontWeight:'700' }}>Go to login</Text>
+                    <Text style={{ color: Colors.DEFAULT_BLUE, margin: 5,fontWeight:'700', fontSize:12 }}>Go to login</Text>
                 </TouchableOpacity>
                 <View style={styles.button}>
                     <TouchableOpacity
@@ -135,7 +163,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         justifyContent: 'center',
         paddingHorizontal: 0,
-        paddingBottom: 20,
+        paddingBottom: 10,
         paddingTop: 80
     },
     footer: {
@@ -149,24 +177,25 @@ const styles = StyleSheet.create({
     text_header: {
         color: Colors.GOOGLE_BLUE,
         fontWeight: 'bold',
-        fontSize: 30
+        fontSize: 15
     },
     text_footer: {
         color: '#05375a',
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: '600',
         paddingLeft: 7
     },
     action: {
+        height:40,
         flexDirection: 'row',
         marginTop: 2,
-        borderWidth: 2,
-        borderColor: Colors.LIGHT_GREY2,
+        borderWidth: .5,
+        borderColor:'grey',
         paddingBottom: 0,
         padding: 10,
-        borderRadius: 15,
+        paddingBottom:1,
+        borderRadius: 10,
         backgroundColor: 'white',
-        elevation: 2,
 
     },
     actionError: {
@@ -181,7 +210,8 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 0 : -12,
         paddingLeft: 10,
         color: '#05375a',
-        fontSize: 15, fontWeight: '500'
+        fontSize: 12, 
+        fontWeight: '500'
         // backgroundColor:'white'
     },
     errorMsg: {
@@ -194,13 +224,13 @@ const styles = StyleSheet.create({
     },
     signIn: {
         width: '100%',
-        height: 50,
+        height: 45,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10
     },
     textSign: {
-        fontSize: 18,
+        fontSize: 12,
         fontWeight: 'bold'
     }
 });

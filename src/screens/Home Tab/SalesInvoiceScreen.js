@@ -36,7 +36,7 @@ const SalesInvoiceScreen = ({ navigation }) => {
       redirect: 'follow'
     };
 
-    fetch("https://dbh.erevive.cloud/api/resource/Sales Order?fields=[\"*\"]", requestOptions)
+    fetch("https://erp.etplraipur.com/api/resource/Sales Order?fields=[\"*\"]", requestOptions)
       .then(response => response.text())
       .then(result => {
         console.log(result)

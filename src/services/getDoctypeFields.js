@@ -21,10 +21,13 @@ const getDoctypeFields = (formdata)=>{
       }else if (a.fieldtype=="Attach Image"){
         fieldtype='image'
         a.fieldvalue =[]
-      }else if (a.fieldtype =="Float" && a.options =="Int" ){
+      }else if (a.fieldtype =="Float"){
         // console.log('Phone Number')
         // a.len=10
-        keyboard='phone-pad'
+        keyboard='numeric'
+      }
+      else if (a.fieldtype =="Int"){
+        keyboard='numeric'
       }
       else if (a.fieldtype=="Select"){
         fieldtype='select'
@@ -34,9 +37,17 @@ const getDoctypeFields = (formdata)=>{
         // console.log(a.options.toString().split(" "))
       }
 
+      else if (a.fieldtype=="Long Text"){
+        fieldtype='textarea'
+        a.fieldvalue =''
+        // let mtext = prompt(a.options)
+        // a.options = a.options.toString().split("\n")
+        // console.log(a.options.toString().split(" "))
+      }
+
       else if (a.fieldtype=="Date"){
         fieldtype='date'
-        a.fieldvalue =''
+        // a.fieldvalue =''
         // let mtext = prompt(a.options)
         // console.log(a.options.toString().split(" "))
       }
@@ -83,15 +94,7 @@ const getDoctypeFields = (formdata)=>{
 
      if(a.reqd){
       if(a.label){
-        // if(item){
-        //   for (let i in item.data) {
-        //     if (i === a.fieldname) {
-        //       a.fieldvalue = item.data[i]
-        //       a.docname=a.name
-        //       // console.log('llllllllllllllllllllllllllllllllll',i)
-        //     }
-        //   }
-        // }
+       
         let p = {docname:a?.name?a.name:'',label:a.label, type:fieldtype,placeholder:a.label, key:a.fieldname, options:a.options, value:a.fieldvalue, keyboard:keyboard}
         p.data=a
           if (link_doctype){

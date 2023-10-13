@@ -1,4 +1,4 @@
-package com.dbh_mobile_app;
+package com.gate_management;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

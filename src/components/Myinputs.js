@@ -308,6 +308,8 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
             {item?.type === 'checkbox' ? (
               <View>
                 <Text style={[mstyle.content, { fontWeight: 'bold',paddingLeft:7 }]}>{item.label}</Text>
+                <View style={{paddingLeft:7}}>
+
                 <FlatList
                   data={item.options}
                   numColumns={2}
@@ -317,12 +319,9 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                         <Pressable style={{ flex: 1, flexDirection: 'row' }}
                           onPress={() => {
                             if (givedans) {
-
                             } else {
                               getData(item)
-
                             }
-
                           }}
                         >
 
@@ -348,7 +347,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                           <View style={mstyle.detailContainer}>
                             <View style={[mstyle.titleContainer, { width: '90%' }]}>
                               <Text style={[mstyle.listListTitle, { fontWeight: '600' }]} numberOfLines={4}>
-                                {item} {index}
+                                {item}
                               </Text>
 
                             </View>
@@ -363,6 +362,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                   }}
 
                 />
+                </View>
 
               </View>
             ) : (
@@ -400,7 +400,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
 
                     <View style={{width:10}}/>
 
-                    <Pressable onPress={() => startCamera()} style={{ width: 50, height: 50, marginTop: 10 }} >
+                    <Pressable onPressIn={() => startCamera()} style={{ width: 50, height: 50, marginTop: 10 }} >
                       <Icon name='camera' size={30} style={{ backgroundColor: Colors.LIGHT_GREEN, color: 'green', borderRadius: 50, padding: 10 }} />
                       {/* <Image style={{ width: 50, height: 50 }}
               source={{ uri: 'https://www.nicepng.com/png/detail/127-1276180_photo-album-icon-png-icon-logo-png-album.png' }}
@@ -587,7 +587,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                     mode={item?.type == 'date' ? 'date' : 'time'}
                                     modal
                                     open={open}
-                                    date={item?.value? moment(item?.value).toDate() :moment().toDate()}
+                                    date={item.value?moment(item.value).toDate():moment().toDate()}
                                     onConfirm={text => {
                                       item.value =  moment(new Date(text)).format('yyyy-MM-DD')
                                       console.log(item.value)
@@ -630,7 +630,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                     // // console.log(item)
                                   }}
                                   // value={item?.value}
-                                  defaultValue={item?.value}
+                                  defaultValue={item.value?item.value:null}
                                 />) : (
                                   <TextInput
                                     placeholder={`${item.placeholder}                                                         `}
@@ -644,7 +644,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                       // // console.log(item)
                                     }}
                                     // value={item?.value}
-                                    defaultValue={item?.value}
+                                    defaultValue={item.value?item.value:null}
                                     activeUnderlineColor={Colors.DEFAULT_BLUE}
                                     focusable={true}
                                   />

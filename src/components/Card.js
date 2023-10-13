@@ -94,7 +94,7 @@ const Card = ({ item }) => {
           {data?.status ?
             <View style={{ backgroundColor:"#dde9fd", borderTopRightRadius: 8, borderBottomRightRadius: 8, marginLeft: 'auto' }} >
               <View style={{ padding: 10 }}>
-                <Text style={{ color: Colors.DEFAULT_BLUE, fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>{data.percent}</Text>
+                <Text style={{ color: Colors.DEFAULT_BLUE, fontWeight: 'bold', fontSize: 15, textAlign: 'center' }}>{data.percent}</Text>
                 <Text style={{ color: Colors.DEFAULT_BLUE, fontWeight: '600', fontSize: 12, textAlign: 'center' }}>{data.status}</Text>
               </View>
             </View> : ''}

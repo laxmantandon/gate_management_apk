@@ -36,7 +36,7 @@ const OpportunityScreen = ({ navigation }) => {
   const getData = () => {
     
     setloading(true)
-    frappe.get_list('Opportunity',filters=[["_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Opportunity',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
@@ -65,7 +65,7 @@ const OpportunityScreen = ({ navigation }) => {
 
   const searchFilterFunction = (text) => {
     setloading(true)
-    frappe.get_list('Opportunity',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Opportunity',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState } from 'react';
 import { View, Image, Text, Button, StyleSheet, FlatList, Pressable, Modal, Alert, TouchableOpacity, Vibration, PermissionsAndroid, SafeAreaView, ScrollView, ToastAndroid } from 'react-native';
 import { Colors } from '../contants';
 import { shadow } from 'react-native-paper';
@@ -11,14 +11,17 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import ProductDetailsScreen from './ProductDetailsScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
+import frappe from '../services/frappe';
+import Frappe_Model from './Frappe_Model';
+import moment from 'moment';
 
 
 
-const ExploreScreen = () => {
+const ExploreScreen = ({navigation}) => {
   const [cartList, setcartList] = useState([])
   const [cart, setcart] = useState([])
   const [cartCreated, setcartCreated] = useState(false)
-  const [showCartList, setshowCartList] = useState(false)
+  const [showCartList, setshowCartList] = useState(true)
   const [current_storage, setcurrent_storage] = useState('')
 
   const [isModalOpen, setisModalOpen] = useState(false)
@@ -51,54 +54,87 @@ const ExploreScreen = () => {
 
 
   const createCartStorage = () => {
-    AsyncStorage.getItem('AllCart').then(s => {
-      console.log(JSON.parse(s))
+    let mn_valid= true
+    customerDetails.forEach(a => {
+        if (a.req==1 && a.value == '') {
+          Alert.alert(`Please Enter ${a.label}`)
+          mn_valid= false
+          return
+        }
 
-      if (JSON.parse(s)){
-        let ab_cartlist= JSON.parse(s)
-        console.log(ab_cartlist.length)
-                    customerDetails.forEach(a => {
-                      if (a.req) {
-                        if (a.value == '') {
-                          Alert.alert(`Please Enter ${a.label}`)
-                        }
-                      }
-                    });
-                    let cust = [{ value: {} }]
-
-                    cust[0].value = submitReqData(customerDetails)
-                    cust[0].value.items = cart                    
-                              // cust[0].value.items.name = `cust_cart${ab_cartlist.length}`
-                              console.log(cust)
-                    AsyncStorage.setItem(`cust_cart${ab_cartlist.length}`, JSON.stringify(cust)).then(s => {
-                      AsyncStorage.getItem(`cust_cart${ab_cartlist.length}`).then(e => {
-                        console.log(JSON.parse(e))
-
-                        ab_cartlist.push({'name':`cust_cart${ab_cartlist.length}`})
-                        AsyncStorage.setItem('AllCart', JSON.stringify(ab_cartlist))
-                        
-                        // setcartCreated(true)
-                        // setiscartModalOpen(true)
-
-
-                        setcart([])
-                        // setcart(JSON.parse(r))
-                        setcurrent_storage(`cust_cart${ab_cartlist.length}`)
-                        // createCartListStorage()
-                        getAllCartStorage()
-
-                        setisModalOpen(false)
-
-                        // setisModalOpen(true)
-                        // setcartCreated(true)
-                      })
-                    })
-        
-        // setcartList(JSON.parse(s))
-        // console.log('hai',s)
+      
+    });
+if (mn_valid){
+  setloading(true)
+  let req=submitReqData(customerDetails)
+  req.first_name =req.customer_name
+  req.status='Lead'
+    frappe.new_doc('Lead',req).then((result)=>{
+      console.log('result',result)
+      setloading(false)
+      if(result.data){
+        req.name = result.data.name
+        ToastAndroid.showWithGravityAndOffset(
+          'Lead Succesfully Created',
+          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+        );
+        AsyncStorage.getItem('AllCart').then(s => {
+          console.log(JSON.parse(s))
+    
+          if (JSON.parse(s)){
+            let ab_cartlist= JSON.parse(s)
+            console.log(ab_cartlist.length)
+                        // customerDetails.forEach(a => {
+                        //   if (a.req) {
+                        //     if (a.value == '') {
+                        //       Alert.alert(`Please Enter ${a.label}`)
+                        //     }
+                        //   }
+                        // });
+                        let cust = [{ value: {} }]
+                        cust[0].value = req
+                        cust[0].value.items = cart                    
+                                  // cust[0].value.items.name = `cust_cart${ab_cartlist.length}`
+                                  console.log(cust)
+                        AsyncStorage.setItem(`${req.customer_name} ${req.mobile_no}`, JSON.stringify(cust)).then(s => {
+                          AsyncStorage.getItem(`${req.customer_name} ${req.mobile_no}`).then(e => {
+                            console.log(JSON.parse(e))
+    
+                            ab_cartlist.push({'name':`${req.customer_name} ${req.mobile_no}`})
+                            AsyncStorage.setItem('AllCart', JSON.stringify(ab_cartlist))
+                            
+                            // setcartCreated(true)
+                            // setiscartModalOpen(true)
+    
+    
+                            setcart([])
+                            // setcart(JSON.parse(r))
+                            setcurrent_storage(`${req.customer_name} ${req.mobile_no}`)
+                            // createCartListStorage()
+                            getAllCartStorage()
+    
+                            setisModalOpen(false)
+    
+                            // setisModalOpen(true)
+                            // setcartCreated(true)
+                          })
+                        })
+            
+            // setcartList(JSON.parse(s))
+            // console.log('hai',s)
+    
+          }
+        })
+      }else{
+        ToastAndroid.showWithGravityAndOffset(
+          'Something Wrong',
+          ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50
+        );
 
       }
     })
+  }
+   
 
 
     
@@ -182,6 +218,7 @@ const ExploreScreen = () => {
 
   const SearchProductData = (e) => {
     setOpenScanner(true)
+    setloading(true)
     let text = e
     var myHeaders = new Headers();
     var requestOptions = {
@@ -190,9 +227,11 @@ const ExploreScreen = () => {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
       .then(response => response.text())
       .then(result => {
+        setloading(false)
+
         let v = JSON.parse(result)
         // console.log(v)
         let mapped_array = {}
@@ -211,13 +250,16 @@ const ExploreScreen = () => {
           }
 
           mapped_array = {
-            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
             "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
             "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
           }
         })
         setScannedProduct(mapped_array)
 
+
+      }).catch((e)=>{
+        setloading(false)
 
       })
   }
@@ -232,7 +274,7 @@ const ExploreScreen = () => {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/resource/Item?fields=["*"]`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/resource/Item?fields=["*"]`, requestOptions)
       .then(response => response.text())
       .then(result => {
         let v = JSON.parse(result)
@@ -240,7 +282,7 @@ const ExploreScreen = () => {
         let mapped_array = []
         v.data.forEach(a => {
           mapped_array.push({
-            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
             "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
             "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
           })
@@ -344,57 +386,91 @@ const ExploreScreen = () => {
   const CreateOpp = () => {
     console.log(current_storage)
     // createCustomer
+    setloading(true)
     AsyncStorage.getItem(current_storage).then((res_cart) => {
       let req = JSON.parse(res_cart)
-      req[0].value.opportunity_from="Customer"
-      if(!req[0].value.party_name){
-        if (!current_customer){
-          createCustomer(req[0].value)
-          req[0].value.party_name = current_customer
-        }else{
-          req[0].value.party_name = current_customer
+      req[0].value.opportunity_from="Lead"
+      req[0].value.party_name=req[0].value.name
+      req[0].value.status="Open"
+      // console.log(req[0].value)
+      // console.log( req[0].value)
+      frappe.new_doc('Opportunity', req[0].value).then((resp) => {
+        console.log(resp)
+        setloading(false)
+
+        if (resp.data) {
+          AsyncStorage.getItem('AllCart').then(s => {
+            let rr = JSON.parse(s)
+            console.log(rr)
+            let mapped =[]
+            rr.forEach(a => {
+              if(a.name==current_storage){
+              }else{
+                  mapped.push(a)
+              }
+            });
+            AsyncStorage.setItem('AllCart',JSON.stringify(mapped)).then((y)=>{
+              AsyncStorage.removeItem(current_storage)
+              navigation.navigate('OpportunityScreen')
+              setcurrent_storage()
+              setcart()
+              setcartList(mapped)
+              setshowCartList(true)
+              setisModalOpen(false)
+
+            })
+          })
+          
+        } else {
+          AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy) => {
+          })
+          Alert.alert('Error!', 'Something wrong please check')
         }
-      }
-      console.log(req)
+    
 
-      if (req){
+      }).catch(e=>{
+        setloading(false)
 
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        var raw = JSON.stringify(req[0].value);
+      })
 
-        var requestOptions = {
-          method: req[0].value?.name?'PUT':'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'  
-        };
-        console.log(requestOptions)
+      
+      // if (req){
+      //   var myHeaders = new Headers();
+      //   myHeaders.append("Content-Type", "application/json");
+      //   var raw = JSON.stringify(req[0].value);
 
-        fetch("https://dbh.erevive.cloud/api/resource/Opportunity", requestOptions)
-          .then(response => response.text())
-          .then(result =>{ 
-            let res = JSON.parse(result)
-            console.log(result)
-            if(res.data){
-              req[0].value.name=res.data.name
-              AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy)=>{
-                console.log('create ho gya',JSON.parse(uy))
+      //   var requestOptions = {
+      //     method: req[0].value?.name?'PUT':'POST',
+      //     headers: myHeaders,
+      //     body: raw,
+      //     redirect: 'follow'  
+      //   };
+      //   console.log(requestOptions)
 
-                CreateQuatation()
+      //   fetch("https://erp.etplraipur.com/api/resource/Opportunity", requestOptions)
+      //     .then(response => response.text())
+      //     .then(result =>{ 
+      //       let res = JSON.parse(result)
+      //       console.log(result)
+      //       if(res.data){
+      //         req[0].value.name=res.data.name
+      //         AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy)=>{
+      //           console.log('create ho gya',JSON.parse(uy))
+
+      //           CreateQuatation()
                
-              })
+      //         })
 
-            }
+      //       }
 
           
-          })
-          .catch(error => console.log('error', error));
+      //     })
+      //     .catch(error => console.log('error', error));
 
 
 
 
-      }
+      // }
     })
 
   }
@@ -402,61 +478,48 @@ const ExploreScreen = () => {
 
   const CreateQuatation=()=>{
 
+  setloading(true)
     AsyncStorage.getItem(current_storage).then((res_cart) => {
       let req = JSON.parse(res_cart)
-      req[0].value.quotation_to="Customer"
-      req[0].value.transaction_date="2023-08-25"
+      req[0].value.party_name=req[0].value.name
+      req[0].value.status="Draft"
+      req[0].value.quotation_to="Lead"
+      req[0].value.transaction_date=moment(new Date()).format('yyyy-MM-DD')
       req[0].value.order_type="Sales"
-      // req[0].value.transaction_date="Customer"
-      
-      if(!req[0].value.party_name){
-        if (!current_customer){
-          createCustomer(req[0].value)
-          req[0].value.party_name = current_customer
-        }else{
-          req[0].value.party_name = current_customer
-        }
-      }
-      console.log(req)
+      // console.log(req[0].value)
+      // console.log( req[0].value)
+      frappe.new_doc('Quotation', req[0].value).then((resp) => {
+        console.log(resp)
+        setloading(true)
 
-      if (req){
-
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        var raw = JSON.stringify(req[0].value);
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'  
-        };
-        console.log(requestOptions)
-
-        fetch("https://dbh.erevive.cloud/api/resource/Quotation", requestOptions)
-          .then(response => response.text())
-          .then(result =>{ 
-            let res = JSON.parse(result)
-            console.log(result)
-            if(res.data){
-              req[0].value.name=res.data.name
-              // AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy)=>{
-              //   console.log('create ho gya',JSON.parse(uy))
-
-              //   // CreateQuatation()
-               
-              // })
-
-            }
-
-          
+        if (resp.data) {
+          AsyncStorage.getItem('AllCart').then(s => {
+            let rr = JSON.parse(s)
+            console.log(rr)
+            let mapped =[]
+            rr.forEach(a => {
+              if(a.name==current_storage){
+              }else{
+                  mapped.push(a)
+              }
+            });
+            AsyncStorage.setItem('AllCart',JSON.stringify(mapped)).then((y)=>{
+              AsyncStorage.removeItem(current_storage)
+              navigation.navigate('OpportunityScreen')
+              setcurrent_storage()
+              setcart()
+              setcartList(mapped)
+              setshowCartList(true)
+            })
           })
-          .catch(error => console.log('error', error));
+          
+        } else {
+          AsyncStorage.setItem(current_storage, JSON.stringify(req)).then((uy) => {
+          })
+          Alert.alert('Error!', 'Something wrong please check')
+        }
 
-
-
-
-      }
+      })
     })
 
   }
@@ -476,7 +539,7 @@ const ExploreScreen = () => {
       redirect: 'follow'
     };
     
-    fetch("https://dbh.erevive.cloud/api/resource/Customer", requestOptions)
+    fetch("https://erp.etplraipur.com/api/resource/Customer", requestOptions)
       .then(response => response.text())
       .then(results =>{ 
         // console.log(results) 
@@ -500,10 +563,18 @@ setcurrent_customer('')
 
   }
 
+  const [Refreshing, setRefreshing] = useState(false)
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 100);
+  }, []);
 
   return (
     <SafeAreaView style={{flex:1}}>
-
+      <ScrollView>
+      <Frappe_Model loading={loading} />
 
       {showCartList?(
         <View style={{padding:5}}>
@@ -602,7 +673,7 @@ setcurrent_customer('')
                       setshowCartList(true)
                       
                     }} style={styles.buttonTouchable}>
-                      <Text style={{color:Colors.DEFAULT_BLUE, fontWeight:'700'}}>Go To Cart List</Text>
+                      {/* <Text style={{color:Colors.DEFAULT_BLUE, fontWeight:'700'}}>Go To Cart List</Text> */}
                     </TouchableOpacity>
                   }
                 />
@@ -612,19 +683,20 @@ setcurrent_customer('')
                   {/* <Text>{OpenScanner}</Text> */}
                   <ProductDetailsScreen item={ScannedProduct} />
                   <View style={{ paddingVertical: 10 }}>
-                    <Text style={{ fontSize: 12, color: 'black', fontWeight: 'bold' }}>
-                      Similar Products
+                    <Text style={{ fontSize: 18, color:'black', fontWeight: 'bold', paddingBottom:10 }}>
+                      Similar Products :
                     </Text>
                     <FlatList
                       horizontal={true}
                       data={similarProducts}
                       renderItem={({ item }) => {
                         return (
-                          <Pressable onPress={()=>{SearchProductData(item?.item_code)  }} style={{ width: 100, marginRight: 8 }}>
+                          <Pressable onPress={()=>{SearchProductData(item?.item_code)  }} style={{ width: 150, marginRight: 8,elevation:4,paddingBottom:10 }}>
                             <View>
                               <Image source={{ uri: item?.image }} style={{ width: 'auto', height: 100, borderRadius: 10 }} />
-                              <Text numberOfLines={1} style={{ fontSize: 12, color: 'black', fontWeight: '500' }}>{item?.title}</Text>
-                              <Text numberOfLines={1} style={{ fontSize: 12, color: 'black' }}>MRP:- Rs. {item?.mrp}</Text>
+                              <Text numberOfLines={2} style={{ fontSize: 12, color: 'black', fontWeight: '700' }}>{item?.title}</Text>
+
+                              <Text numberOfLines={1} style={{ fontSize: 12, color: Colors.DEFAULT_BLUE,fontWeight:'500' }}>MRP:- Rs. {item?.mrp}</Text>
                             </View>
                           </Pressable>
                         )
@@ -633,30 +705,33 @@ setcurrent_customer('')
                     />
                   </View>
         
-                  <Pressable style={{ backgroundColor: 'gold', padding: 10, marginBottom: 10 }} onPress={() => {
-                    addProductTocart(ScannedProduct)
-                    // console.log(ScannedProduct)
-                  }}>
-                    <Text style={{ color: 'white', fontWeight: '700' }}>Add To Cart</Text>
-                  </Pressable>
+                 
+                  <View style={{flexDirection:'row'}}>
+                  <Pressable
+              onPress={()=>{addProductTocart(ScannedProduct)}}
+             style={{flex:1, backgroundColor:'gold', borderRadius: 10, padding: 10, margin: 5, 
+             marginBottom:1,marginTop:1, elevation: 5,marginBottom:10 }} >
+              <View style={{ flexDirection:'row',padding: 1 }}>
+                <Icon name='cart-outline' size={23} color={Colors.DEFAULT_BLUE} />
+                <Text style={{ fontSize: 15, color:Colors.DEFAULT_BLUE, fontWeight: '700',paddingHorizontal:10 }}>Add To Cart</Text>
+              </View>
+            </Pressable>
+            <Pressable
+              onPress={()=>{setOpenScanner(false)}}
+             style={{flex:1, backgroundColor:Colors.DEFAULT_BLUE, borderRadius: 10, padding: 10, margin: 5, 
+             marginBottom:1,marginTop:1, elevation: 5,marginBottom:10 }} >
+              <View style={{ flexDirection:'row',padding: 1 }}>
+                <Icon name='qr-code-outline' size={20} color={'white'} />
+                <Text style={{ fontSize: 15, color:'white', fontWeight: '700',paddingHorizontal:10 }}>Scan QR Code</Text>
+              </View>
+            </Pressable>
+                  </View>
         
-                  <Pressable style={{ backgroundColor: 'blue', padding: 10 }} onPress={() => { setOpenScanner(false) }}>
-                    <View style={{flexDirection:"row"}}>
-                      <Icon name={'qr-code-outline'}  size={25}/>
-                      <Text style={{ color: 'white', fontWeight: '700' }}>Scan QR</Text>
-
-                    </View>
-                  </Pressable>
-        
+                 
                 </ScrollView>
               )}
         </View>
-        
       )}
-
-
-      
-
 
       <Modal visible={isModalOpen}
         animationType="slide"
@@ -717,54 +792,20 @@ setcurrent_customer('')
                   )
                 }}
 
-                ListFooterComponent={()=>{
+                ListHeaderComponent={()=>{
                   return(
                     <View>
-
-                    <Pressable style={{ backgroundColor:Colors.DEFAULT_BLUE,borderRadius:5, padding: 10,marginHorizontal:10 }} onPress={() => { 
-                                setisModalOpen(false);
-                                setshowCartList(false)
-                                setOpenScanner(false)                    
-                    }}>
-                    {/* <Text style={{ color: 'white', fontWeight: '700' }}>Scan QR</Text> */}
-                    <View style={{flexDirection:"row", justifyContent:'center'}}>
-                      <Icon name={'qr-code-outline'}  size={20} style={{color:'white'}}/>
-                      <Text style={{ color: 'white', fontWeight: '700' }}> Scan QR</Text>
-                    </View>
-                  
-                  </Pressable>
-
-
-                  <Pressable style={{ backgroundColor:Colors.DEFAULT_BLUE,borderRadius:5, padding: 10,marginHorizontal:10 }} 
-                    onPress={() => { 
-                                CreateOpp()                    
-                    }}>
-                    {/* <Text style={{ color: 'white', fontWeight: '700' }}>Scan QR</Text> */}
-                    <View style={{flexDirection:"row", justifyContent:'center'}}>
-                      {/* <Icon name={'qr-code-outline'}  size={20} style={{color:'white'}}/> */}
-                      <Text style={{ color: 'white', fontWeight: '700' }}> Create Opportunity</Text>
-                    </View>
-                  
-                  </Pressable>
-
-
-
-                  <Pressable style={{ backgroundColor:Colors.DEFAULT_BLUE,borderRadius:5, padding: 10,marginHorizontal:10 }} 
-                    onPress={() => { 
-                      CreateQuatation()                    
-                    }}>
-                    {/* <Text style={{ color: 'white', fontWeight: '700' }}>Scan QR</Text> */}
-                    <View style={{flexDirection:"row", justifyContent:'center'}}>
-                      {/* <Icon name={'qr-code-outline'}  size={20} style={{color:'white'}}/> */}
-                      <Text style={{ color: 'white', fontWeight: '700' }}> Create Quatation</Text>
-                    </View>
-                  
-                  </Pressable>
-
-
-                  {/*  */}
-
-
+                      <Pressable style={{ backgroundColor: Colors.DEFAULT_BLUE, borderRadius: 5, padding: 10, marginHorizontal: 10,
+                       marginTop:5 }} onPress={() => {
+                        setisModalOpen(false);
+                        setshowCartList(false)
+                        setOpenScanner(false)
+                      }}>
+                        <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+                          <Icon name={'qr-code-outline'} size={20} style={{ color: 'white' }} />
+                          <Text style={{ color: 'white', fontWeight: '700' }}> Scan QR</Text>
+                        </View>
+                      </Pressable>
                   </View>
                   )
                 }}
@@ -794,7 +835,26 @@ setcurrent_customer('')
 
             </Pressable> */}
             {cartCreated ? (
-              <ProductsScreen item={cart} cart_productsList={cart} />
+              <View>
+                {/* <ProductsScreen item={cart} cart_productsList={cart} refreshcart={onRefresh} /> */}
+                <View style={{ flexDirection: 'row', marginBottom:5 }}>
+                        <Pressable style={{ flex: 1, backgroundColor: Colors.DEFAULT_BLUE, borderRadius: 5, padding: 10, marginLeft:10, marginRight:5  }}
+                          onPress={() => { CreateOpp() }}>
+                          <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+                            <Icon name={'add-circle-outline'} size={20} style={{ color: 'white' }} />
+                            <Text style={{ color: 'white', fontWeight: '700' }}> Create Opportunity</Text>
+                          </View>
+                        </Pressable>
+
+                        {/* <Pressable style={{ flex: 1, backgroundColor: Colors.DEFAULT_BLUE, borderRadius: 5, padding: 10, marginRight: 10 }}
+                          onPress={() => { CreateQuatation() }}>
+                          <View style={{ flexDirection: "row", justifyContent: 'center' }}>
+                            <Icon name={'add-circle-outline'} size={20} style={{ color: 'white' }} />
+                            <Text style={{ color: 'white', fontWeight: '700' }}> Create Quatation</Text>
+                          </View>
+                        </Pressable> */}
+                      </View>
+                </View>
 
             ) : (<Pressable onPressIn={() => {
               createCartStorage()
@@ -814,6 +874,9 @@ setcurrent_customer('')
         </View>
       </Modal>
 
+
+</ScrollView>
+      
 
     </SafeAreaView>
   );

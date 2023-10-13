@@ -10,7 +10,7 @@ import Frappe_Model from '../Frappe_Model'
 import frappe from '../../services/frappe'
 
 
-const SalesOrderScreen = ({ navigation }) => {
+const SalesOrderScreen = ({ navigation, item }) => {
   const [ListData, setListData] = useState([])
   const [ScreensData, setScreensData] = useState([])
   const [responseData, setresponseData] = useState([])
@@ -28,6 +28,8 @@ const SalesOrderScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
+    console.log(item)
+
 
     getData()
   }, [])
@@ -36,7 +38,7 @@ const SalesOrderScreen = ({ navigation }) => {
   const getData = () => {
     
     setloading(true)
-    frappe.get_list('Sales Order',filters=[["Sales+Order","_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Sales Order',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
@@ -65,7 +67,7 @@ const SalesOrderScreen = ({ navigation }) => {
 
   const searchFilterFunction = (text) => {
     setloading(true)
-    frappe.get_list('Sales Order',filters={'modified_by':'kamesh@erevive.in','name': ['like', `%${text}%`]}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Sales Order',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){

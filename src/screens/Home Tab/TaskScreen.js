@@ -43,7 +43,7 @@ const TaskScreen = ({ navigation }) => {
   const getData = () => {
     
     setloading(true)
-    frappe.get_list('Task',filters=[["Task","_assign","like","%kamesh@erevive.in%"]], fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Task',filters={}, fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){

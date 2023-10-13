@@ -378,7 +378,7 @@ a.read_only=1
     <ScrollView keyboardShouldPersistTaps="handled">
       <Frappe_Model loading={loading} text={loading_text} />
       {/* <Text>QuotationDetailsScreen</Text> */}
-      {/* <WebView source={{ uri: 'https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=SAL-QTN-202300003&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en' }} 
+      {/* <WebView source={{ uri: 'https://erp.etplraipur.com/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=SAL-QTN-202300003&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en' }} 
       style={{ flex: 1, width:'auto', height:350 }} /> */}
 
 
@@ -399,7 +399,7 @@ a.read_only=1
               appendExt: "pdf",
               path: dirs.DocumentDir + `/${item.data.name}.pdf`,
             })
-              .fetch("GET", `https://dbh.erevive.cloud/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=${item.data.name}&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en`, {
+              .fetch("GET", `https://erp.etplraipur.com/api/method/frappe.utils.print_format.download_pdf?doctype=Quotation&name=${item.data.name}&format=Standard&no_letterhead=1&letterhead=No%20Letterhead&settings=%7B%7D&_lang=en`, {
               }).then((res) => {
                 setloading(false)
 

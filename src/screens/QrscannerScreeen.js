@@ -283,7 +283,7 @@ const QrscannerScreeen = ({navigation,route: {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/resource/Item?filters={"item_code":"${text}"}&fields=["*"]`, requestOptions)
       .then(response => response.text())
       .then(result => {
         let v = JSON.parse(result)
@@ -304,7 +304,7 @@ const QrscannerScreeen = ({navigation,route: {
           }
 
           mapped_array = {
-            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
             "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
             "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
           }
@@ -325,7 +325,7 @@ const QrscannerScreeen = ({navigation,route: {
       redirect: 'follow'
     };
 
-    fetch(`https://dbh.erevive.cloud/api/resource/Item?fields=["*"]`, requestOptions)
+    fetch(`https://erp.etplraipur.com/api/resource/Item?fields=["*"]`, requestOptions)
       .then(response => response.text())
       .then(result => {
         let v = JSON.parse(result)
@@ -333,7 +333,7 @@ const QrscannerScreeen = ({navigation,route: {
         let mapped_array = []
         v.data.forEach(a => {
           mapped_array.push({
-            "image": `https://dbh.erevive.cloud/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
+            "image": `https://erp.etplraipur.com/${a.image}`, "subtitle": `Price - ${a.dbh_mrp}`,
             "rate": a.dbh_mrp, "title": a.item_name, "description": a.description, "item_name": a.item_name,
             "qty": 0, "status": 'Add to Cart', "percent": 0, "item_code": a.name, 'mrp': a.dbh_mrp, 'sp': a.dbh_sp, 'dp': a.dbh_dp
           })
@@ -465,7 +465,7 @@ const QrscannerScreeen = ({navigation,route: {
         };
         console.log(requestOptions)
 
-        fetch("https://dbh.erevive.cloud/api/resource/Opportunity", requestOptions)
+        fetch("https://erp.etplraipur.com/api/resource/Opportunity", requestOptions)
           .then(response => response.text())
           .then(result =>{ 
             setloading(false)
@@ -539,7 +539,7 @@ const QrscannerScreeen = ({navigation,route: {
         };
         console.log(requestOptions)
 
-        fetch("https://dbh.erevive.cloud/api/resource/Quotation", requestOptions)
+        fetch("https://erp.etplraipur.com/api/resource/Quotation", requestOptions)
           .then(response => response.text())
           .then(result =>{ 
             let res = JSON.parse(result)
@@ -600,7 +600,7 @@ const QrscannerScreeen = ({navigation,route: {
       redirect: 'follow'
     };
     
-    fetch("https://dbh.erevive.cloud/api/resource/Customer", requestOptions)
+    fetch("https://erp.etplraipur.com/api/resource/Customer", requestOptions)
       .then(response => response.text())
       .then(results =>{ 
         let result =JSON.parse(results)

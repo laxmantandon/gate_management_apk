@@ -66,7 +66,7 @@ const CartScreen = ({ item }) => {
     //   redirect: 'follow'
     // };
 
-    // fetch(`https://dbh.erevive.cloud/api/resource/${item?.link_doctype}?parent=${item?.docname}&fields=["*"]`, requestOptions)
+    // fetch(`https://erp.etplraipur.com/api/resource/${item?.link_doctype}?parent=${item?.docname}&fields=["*"]`, requestOptions)
     //   .then(response => response.text())
     //   .then(result =>{ 
     //     let v= JSON.parse(result)

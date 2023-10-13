@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, Text, Pressable } from 'react-native';
+import { View, ActivityIndicator, Text, Pressable, Alert } from 'react-native';
 import {
   NavigationContainer,
   DefaultTheme as NavigationDefaultTheme,
@@ -46,11 +46,14 @@ import QuatationDetailsScreen from './src/screens/Home Tab/QuotationDetailsScree
 import SalesOrderScreen from './src/screens/Home Tab/SalesOrderScreen';
 import AddSalesOrderScreen from './src/screens/Home Tab/AddSalesOrderScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import frappe from './src/services/frappe';
 // import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const Drawer = createDrawerNavigator();
 
 const App = () => {
+
+
   // const [isLoading, setIsLoading] = React.useState(true);
   // const [userToken, setUserToken] = React.useState(null); 
   // AsyncStorage.clear()
@@ -186,13 +189,14 @@ const App = () => {
         <NavigationContainer theme={theme}>
           {loginState.userToken !== null ? (
             <stack.Navigator >
-              <stack.Screen name="HomeDrawer" component={MainTabScreen} options={() => ({ headerShown: false })} />
+              {/* <stack.Screen name="HomeDrawer" component={MainTabScreen} options={() => ({ headerShown: false })} /> */}
               <stack.Screen name="Lead" component={LeadScreen} options={({ navigation }) => ({
-                title: 'Lead',
+                headerShown:false,
+                title: 'Gate Entry',
                 headerTitle:()=>{
                   return(
                   <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Lead</Text>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Gate Entry</Text>
                   </View>
                   )
   
@@ -200,11 +204,20 @@ const App = () => {
                   
                   headerRight: () => {
                   return (
-                    <Pressable  onPressIn={() => { navigation.navigate('AddLead', Item = '') }} style={{ flexDirection: 'row' }}>
+                    <Pressable  onPressIn={() => { 
+                      Alert.alert('Confirm!','Do you want to logout',[
+                        {
+                          text: 'Cancel',
+                          onPress: () => null,
+                          style: 'cancel',
+                        },
+                        { text: 'LOG OUT', onPress: () =>{()=>{} } },
+                      ]); 
+                    }} style={{ flexDirection: 'row' }}>
                       <View style={{ paddingHorizontal: 1 }}>
-                        <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
+                        <Icon name="power-outline" size={25} color={Colors.DEFAULT_RED} style={{fontWeight:'bold'}}></Icon>
                       </View>
-                      <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Lead</Text>
+                      {/* <Text style={{color:Colors.DEFAULT_RED, fontSize:12, fontWeight:'bold'}}> Log Out</Text> */}
 
                     </Pressable>
                   )
@@ -224,11 +237,11 @@ const App = () => {
                 headerTitle:()=>{
                 return(<View>
                     {item?(<View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Lead</Text>
+                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Update Gate Entry</Text>
                       <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
                     </View>):(
                     <View>
-                    <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Lead</Text>
+                    <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Gate Entry</Text>
                   </View>)}
 
                   </View>
@@ -240,7 +253,7 @@ const App = () => {
                     <View>
                       {item?(
                        <View>
-                         <Pressable 
+                         {/* <Pressable 
                         onPressIn={() => { 
                           // navigation.navigate('QrscannerScreeen', Item = {item})
                           navigation.navigate('AddOpportunityScreen', Item = {item})
@@ -264,7 +277,7 @@ const App = () => {
                             <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
                             <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Quotation</Text>
                           </View>
-                        </Pressable>
+                        </Pressable> */}
                         </View>
                       ):''}
                     </View>
