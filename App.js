@@ -27,8 +27,8 @@ import RootStackScreen from './src/screens/RootStackScreen';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LeadScreen from './src/screens/Home Tab/LeadScreen';
-import AddLeadScreen from './src/screens/Home Tab/AddLeadScreen';
+import LeadScreen from './src/screens/Home Tab/GateEntryListScreen';
+import AddGateEntryScreen from './src/screens/Home Tab/AddGateEntryScreen';
 import { Colors } from './src/contants';
 import OpportunityScreen from './src/screens/Home Tab/OpportunityScreen';
 import AddOpportunityScreen from './src/screens/Home Tab/AddOpportunityScreen';
@@ -47,6 +47,7 @@ import SalesOrderScreen from './src/screens/Home Tab/SalesOrderScreen';
 import AddSalesOrderScreen from './src/screens/Home Tab/AddSalesOrderScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import frappe from './src/services/frappe';
+import GateEntryList from './src/screens/Home Tab/GateEntryListScreen';
 // import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
 
 const Drawer = createDrawerNavigator();
@@ -190,7 +191,7 @@ const App = () => {
           {loginState.userToken !== null ? (
             <stack.Navigator >
               {/* <stack.Screen name="HomeDrawer" component={MainTabScreen} options={() => ({ headerShown: false })} /> */}
-              <stack.Screen name="Lead" component={LeadScreen} options={({ navigation }) => ({
+              <stack.Screen name="GateEntry" component={GateEntryList} options={({ navigation }) => ({
                 headerShown:false,
                 title: 'Gate Entry',
                 headerTitle:()=>{
@@ -225,12 +226,7 @@ const App = () => {
 
               })
               } />
-
-{/* <stack.Screen name="DoctypeForm" component={DoctypeFormScreen} options={{ title: 'All Cart List' }} /> */}
-{/* <stack.Screen name="DoctypeList" component={DoctypeListScreen} options={{ title: 'All Cart List' }} /> */}
-<stack.Screen name="QrscannerScreeen" component={QrscannerScreeen} options={{ title: 'All Cart List' }} />
-
-              <stack.Screen name="AddLead" component={AddLeadScreen} options={({ navigation, route: {
+              <stack.Screen name="AddGateEntry" component={AddGateEntryScreen} options={({ navigation, route: {
                 params: { item },
               }
               }) => ({
@@ -285,236 +281,7 @@ const App = () => {
                 },
               })} />
 
-              <stack.Screen name="OpportunityScreen" component={OpportunityScreen} options={({ navigation }) => ({
-                // title: 'Opportunity', 
-                 headerTitle:()=>{
-                  return(
-                  <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Opportunity</Text>
-                  </View>
-                  )
-  
-                  },
-                
-                headerRight: () => {
-                  return (
-                     <Pressable  onPressIn={() => { navigation.navigate('AddOpportunityScreen', Item = '') }} style={{ flexDirection: 'row' }}>
-                     <View style={{ paddingHorizontal: 1 }}>
-                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
-                     </View>
-                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Opportunity</Text>
-                   </Pressable>
-                  )
-                }
-
-              })
-              } />
-
-              
-
-              <stack.Screen name="AddOpportunityScreen" component={AddOpportunityScreen} options={({ navigation, route: {
-                params: { item },
-              }
-              }) => ({
-                title: 'Details Opportunity', 
-             
-                headerTitle:()=>{
-                  return(<View>
-                      {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Opportunity'?'Update Opportunity':`Add Opportunity From ${item.doctype}`}</Text>
-                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
-                      </View>):(
-                      <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Opportunity</Text>
-                    </View>)}
-  
-                    </View>
-                  )
-  
-                  },
-                  headerRight: () => {
-                    return (
-                      <View>
-                        {/* {item?(
-                          <Pressable 
-                          onPressIn={() => { 
-                            navigation.navigate('QrscannerScreeen', Item = {item}) 
-                            // navigation.navigate('QuatationDetailsScreen', Item = {item}) 
-                          }}
-                           style={{ flexDirection: 'row' }}>
-                            <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
-                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
-                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Quotation</Text>
-                            </View>
-                          </Pressable>
-                        ):''} */}
-                      </View>
-                    )
-                  },
-              })
-              } /> 
-
-              <stack.Screen name="SalesInvoiceScreen" component={SalesInvoiceScreen} options={({ navigation }) => ({
-                title: 'Sales Invoice', headerRight: () => {
-                  return (
-                    <View style={{ flexDirection: 'row' }}>
-                      <View style={{ paddingHorizontal: 5 }}>
-                        <Icon name="add-circle-outline" size={30} color={Colors.DEFAULT_BLUE}
-                          onPressIn={() => { navigation.navigate('AddSalesInvoiceScreen', Item = '') }} ></Icon>
-                      </View>
-
-                    </View>
-                  )
-                }
-
-              })
-              } />
-
-              <stack.Screen name="AddSalesInvoiceScreen" component={AddSalesInvoiceScreen} options={{ title: 'Sales Invoice Details' }} />
-
-
-
-
-              <stack.Screen name="TaskScreen" component={TaskScreen} />
-              <stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
-              <stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
-
-
-              <stack.Screen name="QuatationScreen" component={QuotationScreen} options={({ navigation }) => ({
-                // title: 'Opportunity', 
-                 headerTitle:()=>{
-                  return(
-                  <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Quatation</Text>
-                  </View>
-                  )
-  
-                  },
-                
-                headerRight: () => {
-                  return (
-                     <Pressable  onPressIn={() => { navigation.navigate('QuatationDetailsScreen', Item = '') }} style={{ flexDirection: 'row' }}>
-                     <View style={{ paddingHorizontal: 1 }}>
-                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
-                     </View>
-                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Quatation</Text>
-                   </Pressable>
-                  )
-                }
-
-              })
-              } />
-              <stack.Screen name="QuatationDetailsScreen" component={QuatationDetailsScreen} options={({ navigation, route: {
-                params: { item },
-              }
-              }) => ({
-                title: 'Details Quatation', 
-             
-                headerTitle:()=>{
-                  return(<View>
-                      {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Quotation'?'Update Quotation':`Add Quotation From ${item.doctype}`}</Text>
-                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
-                      </View>):(
-                      <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Quotation</Text>
-                    </View>)}
-  
-                    </View>
-                  )
-  
-                  },
-                  headerRight: () => {
-                    return (
-                      <View>
-                        {item?(
-                          <Pressable 
-                          onPressIn={() => { 
-                            // navigation.navigate('QrscannerScreeen', Item = {item}) 
-                        }}
-                           style={{ flexDirection: 'row' }}>
-                            {/* <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
-                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
-                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Sales order</Text>
-                            </View> */}
-                          </Pressable>
-                        ):''}
-                      </View>
-                    )
-                  },
-              })
-              } />
-
-<stack.Screen name="SalesOrderScreen" component={SalesOrderScreen} options={({ navigation }) => ({
-                 headerTitle:()=>{
-                  return(
-                  <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Sales Order</Text>
-                  </View>
-                  )
-  
-                  },
-                
-                headerRight: () => {
-                  return (
-                     <Pressable  onPressIn={() => { navigation.navigate('AddSalesOrderScreen', Item = '') }} style={{ flexDirection: 'row' }}>
-                     <View style={{ paddingHorizontal: 1 }}>
-                       <Icon name="add-circle-outline" size={20} color={Colors.DEFAULT_BLUE} ></Icon>
-                     </View>
-                     <Text style={{color:Colors.DEFAULT_BLUE, fontSize:12, fontWeight:'bold'}}>New Sales Order</Text>
-                   </Pressable>
-                  )
-                }
-
-              })
-              } />
-              <stack.Screen name="AddSalesOrderScreen" component={AddSalesOrderScreen} options={({ navigation, route: {
-                params: { item },
-              }
-              }) => ({
-                title: 'Details Sales Order', 
-             
-                headerTitle:()=>{
-                  return(<View>
-                      {item?(<View>
-                        <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}> {item.doctype=='Sales Order'?'Update Quotation':`Add Sales Order From ${item.doctype}`}</Text>
-                        <Text style={{fontSize:12, color:'grey'}}>{item.title}</Text>
-                      </View>):(
-                      <View>
-                      <Text style={{fontSize:15, fontWeight:'bold', color:'black'}}>Add New Sales Order</Text>
-                    </View>)}
-  
-                    </View>
-                  )
-  
-                  },
-                  headerRight: () => {
-                    return (
-                      <View>
-                        {item?(
-                          <Pressable 
-                          onPressIn={() => { 
-                            // navigation.navigate('QrscannerScreeen', Item = {item}) 
-                        }}
-                           style={{ flexDirection: 'row' }}>
-                            {/* <View style={{ paddingHorizontal: 5, flexDirection: 'row' }}>
-                              <Icon name="add-circle-outline" size={22} color={Colors.DEFAULT_BLUE} ></Icon>
-                              <Text style={{ color: Colors.DEFAULT_BLUE,fontSize:13, fontWeight:'bold' }}> Sales order</Text>
-                            </View> */}
-                          </Pressable>
-                        ):''}
-                      </View>
-                    )
-                  },
-              })
-              } />
-
-
-
-              <stack.Screen name="SupportScreen" component={SupportScreen} />
-              <stack.Screen name="NotificationScreen" component={NotificationScreen} />
-              <stack.Screen name="SettingsScreen" component={SettingsScreen} />
-              <stack.Screen name="BookmarkScreen" component={BookmarkScreen} />
+           
             </stack.Navigator>
           )
             :

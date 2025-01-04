@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ExploreScreen from './ExploreScreen';
 import ProfileScreen from './ProfileScreen';
 import HomeScreen from './tab screens/HomeScreen';
-import LeadScreen from './Home Tab/LeadScreen';
+import LeadScreen from './Home Tab/GateEntryListScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import { Colors } from '../contants';

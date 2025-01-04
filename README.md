@@ -1,4 +1,4 @@
-# React Native - Geolife Mobile App
+# React Native 
 
 
 ## Setup instructions
@@ -18,7 +18,7 @@ npm install
 
 1. npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
 
-2. cd android
+2. cd android ||  cd android &&  gradlew assembleRelease
  
 3. gradlew assembleDebug 
 

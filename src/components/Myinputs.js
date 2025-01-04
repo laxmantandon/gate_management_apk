@@ -16,12 +16,13 @@ import DatePicker from 'react-native-date-picker'
 import mstyle from './mstyle'
 import SearchableDropDown from 'react-native-searchable-dropdown'
 import frappe from '../services/frappe'
+import Qrscreen from './Qrscreen'
 
 
 
 
 
-const MYinputs = ({ item,inputrefresh }) => {
+const MYinputs = ({ item, inputrefresh }) => {
   // // console.log('FROM MY INPUT',  item)
 
   const [visible, setIsVisible] = useState(false);
@@ -30,17 +31,17 @@ const MYinputs = ({ item,inputrefresh }) => {
 
 
   useEffect(() => {
-    if(item?.type=='select'){
+    if (item?.type == 'select') {
       getLinkedDoctype('a')
     }
 
-    if(item.type=='searchable'){
+    if (item.type == 'searchable') {
       getfiltersdata('y')
       refreshGetData()
     }
 
   }, [])
-  
+
 
   const startCamera = () => {
 
@@ -94,121 +95,127 @@ const MYinputs = ({ item,inputrefresh }) => {
 
   const [givedans, setgivedans] = useState('')
   const [realans, setrealans] = useState(item.ans)
-const [multi_value, setmulti_value] = useState([])
+  const [multi_value, setmulti_value] = useState([])
   const getData = (i) => {
-    
-    if (item?.type === 'multi_checkbox'){
-      let v= i
-      
+
+    if (item?.type === 'multi_checkbox') {
+      let v = i
+
       // console.log(v)
       // item.value =[]
-      if (item?.value){
+      if (item?.value) {
         item.value.push(v)
         setmulti_value(item.value)
         // console.log(item.value)
-      }else{
-        item.value=[]
+      } else {
+        item.value = []
         item.value.push(v)
       }
       setgivedans(i)
-    }else{
-    setgivedans(i)
-    item.gived_ans = i
-    item.value = i
-    // console.log(item.gived_ans)
-    }
-  }
-
-
-  const removeData=(i)=>{
-    for (let [index, p] of multi_value.entries()) {
-    if (i==p){
-      // console.log(p, i)
+    } else {
       setgivedans(i)
       item.gived_ans = i
-      multi_value.splice(index, 1)
-      // console.log(multi_value)
-
-    }
+      item.value = i
+      // console.log(item.gived_ans)
     }
   }
-const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
+
+
+  const removeData = (i) => {
+    for (let [index, p] of multi_value.entries()) {
+      if (i == p) {
+        // console.log(p, i)
+        setgivedans(i)
+        item.gived_ans = i
+        multi_value.splice(index, 1)
+        // console.log(multi_value)
+
+      }
+    }
+  }
+  const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
   const getLinkedDoctype = (text) => {
-// if(item.options.length >0){
+    // if(item.options.length >0){
 
-// }else{
-
-    
-    frappe.get_list(item.link_doctype,filters=[[item.link_doctype,"name","like",`%${text}%` ]], fields=["name"]).then(result => {
-        // console.log('select search data', result)
-        // item.options=[]
-        let mdata = result
-        // mapped_data=[]
-        // mdata.data.forEach(a => {
-        //   let mapped=[]
-        //     if (a.name){
-        //       mapped_data=a
-        //       setLinkedDoctypeData(mapped_data)
-        //       mapped.push(a.name)
-        //     }
-        // });
-        // item.options = mapped
-        // console.log(item.options)
-
-        // let m = JSON.parse(result)
-        // // console.log(m.data)
-        mapped_array = []
-        // setresponseData(m?.data)
-        mdata.data.forEach(a => {
-          // console.log(a)
-          mapped_array.push(a.name)
-        });
-        item.options = mapped_array
-
-        // setListData(mapped_array)
+    // }else{
 
 
+    frappe.get_list(item.link_doctype, filters = [[item.link_doctype, "name", "like", `%${text}%`]], fields = ["name"]).then(result => {
+      // console.log('select search data', result)
+      // item.options=[]
+      let mdata = result
+      // mapped_data=[]
+      // mdata.data.forEach(a => {
+      //   let mapped=[]
+      //     if (a.name){
+      //       mapped_data=a
+      //       setLinkedDoctypeData(mapped_data)
+      //       mapped.push(a.name)
+      //     }
+      // });
+      // item.options = mapped
+      // console.log(item.options)
 
-      })
+      // let m = JSON.parse(result)
+      // // console.log(m.data)
+      mapped_array = []
+      // setresponseData(m?.data)
+      mdata.data.forEach(a => {
+        // console.log(a)
+        mapped_array.push(a.name)
+      });
+      item.options = mapped_array
+
+      // setListData(mapped_array)
+
+
+
+    })
       .catch(error => console.log('error', error));
 
     // }
   }
-  const [read_only, setread_only] = useState(item?.read_only?'none':'auto')
+  const [read_only, setread_only] = useState(item?.read_only ? 'none' : 'auto')
   // const [read_only, setread_only] = useState(item?.read_only?'auto':'auto')
 
-  const refreshGetData=()=>{
-    
+  const refreshGetData = () => {
     setloading(true)
     setTimeout(() => {
       setloading(false)
     }, 1000);
 
   }
+  function refresonefield() {
+    setloading(true)
+    setTimeout(() => {
+      console.log('refreshed')
+      setloading(false)
+    }, 1000);
+  } 
 
-  const getfiltersdata=(text)=>{
-    let req={}
-    if(item.key=='opportunity_from'){
-        req = {
+  const getfiltersdata = (text) => {
+    let req = {}
+    if (item.key == 'opportunity_from') {
+      req = {
         txt: text,
         doctype: item.link_doctype,
         ignore_user_permissions: 0,
         reference_doctype: item.data.parent,
         filters: { "name": ["in", ["Customer", "Lead", "Prospect"]] }
-        }
-        console.log(req)
+      }
+      console.log(req)
 
-        frappe.search_links(req).then((result)=>{
-          console.log(result)
-          mapped=[]
-          result.results.forEach(a => {
-            mapped.push({'name':a.value,'id':a.value})
-          });
-          item.options=mapped
-          console.log(item.options)
-          
-        })
-    }else{
+      frappe.search_links(req).then((result) => {
+        console.log(result)
+        mapped = []
+        result.results.forEach(a => {
+          mapped.push({ 'name': a.value, 'id': a.value })
+        });
+        item.options = mapped
+        console.log(item.options)
+
+      })
+    } else {
       req = {
         txt: text,
         doctype: item.link_doctype,
@@ -218,18 +225,18 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
       console.log(req)
 
       // frappe.search_links(req).then((result)=>{
-      frappe.get_list(item.link_doctype,filters={"name":["like",`%${text}%` ]}, fields=["name"]).then(result => {
+      frappe.get_list(item.link_doctype, filters = { "name": ["like", `%${text}%`] }, fields = ["name"]).then(result => {
         console.log(result)
-        if(result.data){
-          mapped=[]
-        result.data.forEach(a => {
-          mapped.push({'name':a.name,'id':a.name})
-        });
-        item.options=mapped
-        console.log(item.options)
+        if (result.data) {
+          mapped = []
+          result.data.forEach(a => {
+            mapped.push({ 'name': a.name, 'id': a.name })
+          });
+          item.options = mapped
+          console.log(item.options)
         }
       })
-    }  
+    }
     // onRefresh  
   }
 
@@ -245,57 +252,57 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
 
   return (
     <View
-    refreshControl={
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-    }
-     pointerEvents={read_only} style={{overflow:'grey',marginBottom:1}}>
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      pointerEvents={read_only} style={{ overflow: 'grey', marginBottom: 1 }}>
       <View style={[mystyles.inputContainer1, {
-        backgroundColor: 'white', marginTop: 8,marginBottom:1
+        backgroundColor: 'white', marginTop: 8, marginBottom: 1
 
       }]}>
         {item?.type === 'multi_checkbox' ? (
           <View>
-            <Text style={[mstyle.content, { fontWeight: '700',paddingLeft:7 }]}>{item.label}</Text>
+            <Text style={[mstyle.content, { fontWeight: '700', paddingLeft: 7 }]}>{item.label}</Text>
             <FlatList
               data={item.options}
               numColumns={2}
               renderItem={({ item, index }) => {
                 return (
                   <Pressable onPressIn={() => {
-                    if(multi_value.includes(item)){
-                     removeData(item)
-                    }else{
-                       getData(item)
+                    if (multi_value.includes(item)) {
+                      removeData(item)
+                    } else {
+                      getData(item)
                     }
-                     
 
-                   }} style={{ flex: 1, paddingVertical: 5 }}>
+
+                  }} style={{ flex: 1, paddingVertical: 5 }}>
                     <View style={{ flex: 1, flexDirection: 'row' }}
-                      
+
                     >
 
                       <View style={{ backgroundColor: Colors.LIGHT_GREEN, borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }} >
-                       
-                            
-                              <Icon name={multi_value.includes(item) ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
-                                size={20} style={{ padding: 8, color: givedans === realans ? (multi_value.includes(item) ? 'green' : 'red') : 'green' }} />
-                              
 
-                         
+
+                        <Icon name={multi_value.includes(item) ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
+                          size={20} style={{ padding: 8, color: givedans === realans ? (multi_value.includes(item) ? 'green' : 'red') : 'green' }} />
+
+
+
                       </View>
                       <View style={mstyle.detailContainer}>
                         <View style={[mstyle.titleContainer, { width: '90%' }]}>
                           <Text style={[mstyle.listListTitle, { fontWeight: '600' }]} numberOfLines={4}>
-                            {item} 
+                            {item}
                           </Text>
 
                         </View>
                       </View>
-                      </View>
-                    </Pressable>
+                    </View>
+                  </Pressable>
 
 
-                 
+
                 )
 
               }}
@@ -307,67 +314,67 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
           <View>
             {item?.type === 'checkbox' ? (
               <View>
-                <Text style={[mstyle.content, { fontWeight: 'bold',paddingLeft:7 }]}>{item.label}</Text>
-                <View style={{paddingLeft:7}}>
+                <Text style={[mstyle.content, { fontWeight: 'bold', paddingLeft: 7 }]}>{item.label}</Text>
+                <View style={{ paddingLeft: 7 }}>
 
-                <FlatList
-                  data={item.options}
-                  numColumns={2}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View style={{ flex: 1, paddingVertical: 5 }}>
-                        <Pressable style={{ flex: 1, flexDirection: 'row' }}
-                          onPress={() => {
-                            if (givedans) {
-                            } else {
-                              getData(item)
-                            }
-                          }}
-                        >
+                  <FlatList
+                    data={item.options}
+                    numColumns={2}
+                    renderItem={({ item, index }) => {
+                      return (
+                        <View style={{ flex: 1, paddingVertical: 5 }}>
+                          <Pressable style={{ flex: 1, flexDirection: 'row' }}
+                            onPress={() => {
+                              if (givedans) {
+                              } else {
+                                getData(item)
+                              }
+                            }}
+                          >
 
-                          <View style={{ backgroundColor: Colors.LIGHT_GREEN, borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }} >
-                            {givedans ? (
-                              <View>
-                                {
-                                  givedans != item ? (<Icon name={realans === item ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
-                                    size={20} style={{ padding: 8, color: givedans === realans ? (givedans === realans ? 'green' : 'red') : 'green' }} />
-                                  ) : (
-                                    <Icon name={givedans === item ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
-                                      size={20} style={{ padding: 8, color: givedans === item ? (givedans === realans ? 'green' : 'red') : 'gray' }} />
+                            <View style={{ backgroundColor: Colors.LIGHT_GREEN, borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }} >
+                              {givedans ? (
+                                <View>
+                                  {
+                                    givedans != item ? (<Icon name={realans === item ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
+                                      size={20} style={{ padding: 8, color: givedans === realans ? (givedans === realans ? 'green' : 'red') : 'green' }} />
+                                    ) : (
+                                      <Icon name={givedans === item ? 'ios-checkmark-circle' : 'ios-ellipse-outline'}
+                                        size={20} style={{ padding: 8, color: givedans === item ? (givedans === realans ? 'green' : 'red') : 'gray' }} />
 
-                                  )
-                                }
+                                    )
+                                  }
+
+                                </View>
+                              ) : (
+                                <Icon name={'ios-ellipse-outline'}
+                                  size={20} style={{ padding: 8, color: 'gray' }} />
+                              )}
+                            </View>
+                            <View style={mstyle.detailContainer}>
+                              <View style={[mstyle.titleContainer, { width: '90%' }]}>
+                                <Text style={[mstyle.listListTitle, { fontWeight: '600' }]} numberOfLines={4}>
+                                  {item}
+                                </Text>
 
                               </View>
-                            ) : (
-                              <Icon name={'ios-ellipse-outline'}
-                                size={20} style={{ padding: 8, color: 'gray' }} />
-                            )}
-                          </View>
-                          <View style={mstyle.detailContainer}>
-                            <View style={[mstyle.titleContainer, { width: '90%' }]}>
-                              <Text style={[mstyle.listListTitle, { fontWeight: '600' }]} numberOfLines={4}>
-                                {item}
-                              </Text>
-
                             </View>
-                          </View>
 
-                        </Pressable>
+                          </Pressable>
 
 
-                      </View>
-                    )
+                        </View>
+                      )
 
-                  }}
+                    }}
 
-                />
+                  />
                 </View>
 
               </View>
             ) : (
               <View>
-                <Text style={[mstyle.content,{paddingLeft:7}]}>{item.label}</Text>
+                <Text style={[mstyle.content, { paddingLeft: 7 }]}>{item.label}</Text>
                 {item?.type == 'image' ? (
                   <View style={{ paddingHorizontal: 10, paddingVertical: 5 }} >
                     <View>
@@ -398,7 +405,7 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
 
 
 
-                    <View style={{width:10}}/>
+                    <View style={{ width: 10 }} />
 
                     <Pressable onPressIn={() => startCamera()} style={{ width: 50, height: 50, marginTop: 10 }} >
                       <Icon name='camera' size={30} style={{ backgroundColor: Colors.LIGHT_GREEN, color: 'green', borderRadius: 50, padding: 10 }} />
@@ -409,21 +416,21 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                   </View>
                 ) : (
                   <View>
-                   
-                    <View style={[mstyle.inputContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
-                      <View style={[mstyle.inputSubContainer,{backgroundColor:item?.read_only?'silver':'white'}]}>
+
+                    <View style={[mstyle.inputContainer, { backgroundColor: item?.read_only ? 'silver' : 'white' }]}>
+                      <View style={[mstyle.inputSubContainer, { backgroundColor: item?.read_only ? 'silver' : 'white' }]}>
 
                         {item?.type === 'select' ? (
                           <View style={{ flex: 1, flexDirection: 'row' }}>
-                           
+
 
                             <SelectDropdown
                               data={item?.options}
-                              onChangeSearchInputText={(text)=>{
+                              onChangeSearchInputText={(text) => {
                                 // console.log(text)
-                                      if(item.link_doctype){
-                                        getLinkedDoctype(text)
-                                      }
+                                if (item.link_doctype) {
+                                  getLinkedDoctype(text)
+                                }
                               }}
                               defaultValue={item.value}
                               // defaultValueByIndex={0}
@@ -433,29 +440,29 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                                 width: '100%', height: 36
                               }}
                               buttonTextStyle={{ fontSize: 12, }}
-                            
+
                               renderDropdownIcon={isOpened => {
                                 return <FontAwesome name={isOpened ? 'chevron-up' : 'chevron-down'} color={'#444'} size={15} />;
                               }}
 
                               dropdownIconPosition={'right'}
                               dropdownStyle={[mstyle.inputContainer]}
-                              selectedRowStyle={{ backgroundColor: Colors.LIGHT_BLUE,borderColor:Colors.LIGHT_BLUE }}
-                              rowTextStyle={{ fontSize: 12,fontWeight:'600' }}
-                              rowStyle={{backgroundColor:Colors.SECONDARY_WHITE,borderColor:'silver'}}
+                              selectedRowStyle={{ backgroundColor: Colors.LIGHT_BLUE, borderColor: Colors.LIGHT_BLUE }}
+                              rowTextStyle={{ fontSize: 12, fontWeight: '600' }}
+                              rowStyle={{ backgroundColor: Colors.SECONDARY_WHITE, borderColor: 'silver' }}
 
                               onSelect={(selectedItem, index) => {
                                 // console.log(selectedItem, index)
                                 item.value = selectedItem
                                 item.index = index
-                                if(inputrefresh){
-                                inputrefresh()
+                                if (inputrefresh) {
+                                  inputrefresh()
                                 }
                                 // LinkedDoctypeData.forEach(a => {
                                 //   if(a.name==selectedItem){
                                 //     item.fetch=  a
                                 //   }
-                                  
+
                                 // });
 
                               }}
@@ -471,17 +478,17 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                               }}
 
 
-                            search
-                            searchInputStyle={{
-                              backgroundColor: 'white',
-                              borderBottomWidth: 1,
-                              borderBottomColor: '#FFF',
-                            }}
-                            searchPlaceHolder={'Search here'}
-                            searchPlaceHolderColor={'darkgrey'}
-                            renderSearchInputLeftIcon={() => {
-                              return <FontAwesome name={'search'} color={'#444'} size={18} />;
-                            }}
+                              search
+                              searchInputStyle={{
+                                backgroundColor: 'white',
+                                borderBottomWidth: 1,
+                                borderBottomColor: '#FFF',
+                              }}
+                              searchPlaceHolder={'Search here'}
+                              searchPlaceHolderColor={'darkgrey'}
+                              renderSearchInputLeftIcon={() => {
+                                return <FontAwesome name={'search'} color={'#444'} size={18} />;
+                              }}
                             />
 
                             {/* <Feather
@@ -491,175 +498,183 @@ const [LinkedDoctypeData, setLinkedDoctypeData] = useState([])
                   /> */}
                           </View>
                         ) : (
-                          <View style={{flex:1}}>
-                            { item?.type === 'searchable'?(
-                              <View style={{marginBottom:1}}>
-                              {item.value ? (
-                                <View style={{
-                                  padding: 6, marginTop: 2, flexDirection: 'row',
-                                  backgroundColor: 'white', borderColor: 'silver',
-                                  borderWidth: 0, borderRadius: 5, width: '100%'
-                                }}>
+                          <View style={{ flex: 1 }}>
+                            {item?.type === 'searchable' ? (
+                              <View style={{ marginBottom: 1 }}>
+                                {item.value ? (
+                                  <View style={{
+                                    padding: 6, marginTop: 2, flexDirection: 'row',
+                                    backgroundColor: 'white', borderColor: 'silver',
+                                    borderWidth: 0, borderRadius: 5, width: '100%'
+                                  }}>
 
-                                  <Text style={{ color: 'black', width: '90%', fontSize: 15, fontWeight: 'bold' }}> 
-                                  {item.value}</Text>
-                                  <Icon onPress={() => {
-                                    item.value = ''
-                                    item.data = {}
-                                    setloading(true)
-                                    refreshGetData()
+                                    <Text style={{ color: 'black', width: '90%', fontSize: 15, fontWeight: 'bold' }}>
+                                      {item.value}</Text>
+                                    <Icon onPress={() => {
+                                      item.value = ''
+                                      item.data = {}
+                                      setloading(true)
+                                      refreshGetData()
 
-                                  }} name='close-circle-outline' size={25} style={{ color: 'red' }}></Icon>
+                                    }} name='close-circle-outline' size={25} style={{ color: 'red' }}></Icon>
 
-                                </View>
-                              ) : (
+                                  </View>
+                                ) : (
 
-                               <View style={{flex:1}}>
-                                 <SearchableDropDown zIndex={999}
-                                  onItemSelect={(kitem) => {
-                                    // alert('select dealer')
-                                    // console.log('clicked',kitem)
-                                    item.value = kitem.id
-                                    item.data = kitem
-                                    console.log('clicked', item.data)
-                                    setloading(true)
-                                    refreshGetData()
-                                    if(inputrefresh){
-                                    inputrefresh()
-                                    }
-
-
-                                  }}
-
-                                  containerStyle={{ padding: 3, width: '100%' }}
-                                  onRemoveItem={(item, index) => {
-                                    // const items = selectedCrops.filter((sitem) => sitem.name !== item.name);
-                                    // setselectedDelers(items)
-                                  }}
-                                  itemStyle={{
-                                    padding: 10,
-                                    marginTop: 2,
-                                    backgroundColor: 'white',
-                                    borderColor: 'silver',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                  }}
-                                  itemTextStyle={{ color: '#222' }}
-                                  itemsContainerStyle={{ maxHeight: 200 }}
-                                  items={item.options?item.options:[]}
-                                  // defaultIndex={2}
-                                  resetValue={false}
-                                  textInputProps={
-                                    {
-                                      placeholder: item.label,
-                                      underlineColorAndroid: "transparent",
-                                      style: {
-                                        // padding: 8,
-                                        borderWidth: .3,
-                                        borderColor: '#ccc',
-                                        borderRadius: 5,
-                                        color: "black"
-                                      },
-                                      onTextChange: text => {
-                                        getfiltersdata(text)
+                                  <View style={{ flex: 1 }}>
+                                    <SearchableDropDown zIndex={999}
+                                      onItemSelect={(kitem) => {
+                                        // alert('select dealer')
+                                        // console.log('clicked',kitem)
+                                        item.value = kitem.id
+                                        item.data = kitem
+                                        console.log('clicked', item.data)
                                         setloading(true)
                                         refreshGetData()
+                                        if (inputrefresh) {
+                                          inputrefresh()
+                                        }
 
+
+                                      }}
+
+                                      containerStyle={{ padding: 3, width: '100%' }}
+                                      onRemoveItem={(item, index) => {
+                                        // const items = selectedCrops.filter((sitem) => sitem.name !== item.name);
+                                        // setselectedDelers(items)
+                                      }}
+                                      itemStyle={{
+                                        padding: 10,
+                                        marginTop: 2,
+                                        backgroundColor: 'white',
+                                        borderColor: 'silver',
+                                        borderWidth: 1,
+                                        borderRadius: 5,
+                                      }}
+                                      itemTextStyle={{ color: '#222' }}
+                                      itemsContainerStyle={{ maxHeight: 200 }}
+                                      items={item.options ? item.options : []}
+                                      // defaultIndex={2}
+                                      resetValue={false}
+                                      textInputProps={
+                                        {
+                                          placeholder: item.label,
+                                          underlineColorAndroid: "transparent",
+                                          style: {
+                                            // padding: 8,
+                                            borderWidth: .3,
+                                            borderColor: '#ccc',
+                                            borderRadius: 5,
+                                            color: "black"
+                                          },
+                                          onTextChange: text => {
+                                            getfiltersdata(text)
+                                            setloading(true)
+                                            refreshGetData()
+
+                                          }
+                                        }
                                       }
-                                    }
-                                  }
-                                  listProps={
-                                    {
-                                      nestedScrollEnabled: true,
-                                    }
-                                  }
-                                />
-                                </View>
-                              )}
+                                      listProps={
+                                        {
+                                          nestedScrollEnabled: true,
+                                        }
+                                      }
+                                    />
+                                  </View>
+                                )}
 
-                            </View>
-                            ):(
+                              </View>
+                            ) : (
                               <View style={{ flex: 1, flexDirection: 'row' }}>
-                              {item?.type === 'date' || item?.type === 'time' ? (
-                                <View style={{ flex: 1, flexDirection: 'row' }}>
-                                  {/* <Button title="Open" onPress={() => setOpen(true)} style={mstyle.PrimaryButton} /> */}
-                                  <DatePicker
-                                    mode={item?.type == 'date' ? 'date' : 'time'}
-                                    modal
-                                    open={open}
-                                    date={item.value?moment(item.value).toDate():moment().toDate()}
-                                    onConfirm={text => {
-                                      item.value =  moment(new Date(text)).format('yyyy-MM-DD')
-                                      console.log(item.value)
-                                      setOpen(false)
-                                    }}
-                                    onCancel={() => {
-                                      setOpen(false)
-                                    }}
-                                  />
-  
-                                  <Icon
-                                    onPress={() => setOpen(true)}
-                                    name={item?.type == 'date' ? "calendar-outline" : "alarm-outline"}
-                                    size={22}
-                                    color={Colors.DEFAULT_BLUE}
-                                    style={{ paddingVertical: 8, paddingRight: 8 }}
-                                  />
-  
-                                  {item?.type == 'time' ? (
-                                    <Text onPress={() => setOpen(true)}
-                                      style={mstyle.inputText}>{moment(item.value).format('hh:mm a')}</Text>
-                                  ) : (
-                                    <Text onPress={() => setOpen(true)}
-                                      style={mstyle.inputText}>{moment(item.value).format('Do MMM-YYYY')}</Text>
-                                  )}
-  
-                                </View>
-                              ) : (
-                                // <View>
-                                item?.len ? (<TextInput
-                                  placeholder={`${item.placeholder}                                                         `}
-                                  keyboardType={item?.keyboard ? item?.keyboard :'default'}
-                                  placeholderTextColor={'gray'}
-                                  selectionColor={Colors.DEFAULT_GREY}
-                                  style={mstyle.inputText}
-                                  maxLength={item?.len}
-                                  multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
-                                  onChangeText={text => {
-                                    item.value = text
-                                    // // console.log(item)
-                                  }}
-                                  // value={item?.value}
-                                  defaultValue={item.value?item.value:null}
-                                />) : (
-                                  <TextInput
+                                {item?.type === 'date' || item?.type === 'time' ? (
+                                  <View style={{ flex: 1, flexDirection: 'row' }}>
+                                    {/* <Button title="Open" onPress={() => setOpen(true)} style={mstyle.PrimaryButton} /> */}
+                                    <DatePicker
+                                      mode={item?.type == 'date' ? 'date' : 'time'}
+                                      modal
+                                      open={open}
+                                      date={item.value ? moment(item.value).toDate() : moment().toDate()}
+                                      onConfirm={text => {
+                                        item.value = moment(new Date(text)).format('yyyy-MM-DD')
+                                        console.log(item.value)
+                                        setOpen(false)
+                                      }}
+                                      onCancel={() => {
+                                        setOpen(false)
+                                      }}
+                                    />
+
+                                    <Icon
+                                      onPress={() => setOpen(true)}
+                                      name={item?.type == 'date' ? "calendar-outline" : "alarm-outline"}
+                                      size={22}
+                                      color={Colors.DEFAULT_BLUE}
+                                      style={{ paddingVertical: 8, paddingRight: 8 }}
+                                    />
+
+                                    {item?.type == 'time' ? (
+                                      <Text onPress={() => setOpen(true)}
+                                        style={mstyle.inputText}>{moment(item.value).format('hh:mm a')}</Text>
+                                    ) : (
+                                      <Text onPress={() => setOpen(true)}
+                                        style={mstyle.inputText}>{moment(item.value).format('Do MMM-YYYY')}</Text>
+                                    )}
+
+                                  </View>
+                                ) : (
+                                  // <View>
+                                  item?.len ? (<TextInput
                                     placeholder={`${item.placeholder}                                                         `}
                                     keyboardType={item?.keyboard ? item?.keyboard : 'default'}
                                     placeholderTextColor={'gray'}
                                     selectionColor={Colors.DEFAULT_GREY}
-                                    style={[mstyle.inputText,{backgroundColor:item?.read_only?'silver':''}]}
+                                    style={mstyle.inputText}
+                                    maxLength={item?.len}
                                     multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
                                     onChangeText={text => {
                                       item.value = text
                                       // // console.log(item)
                                     }}
                                     // value={item?.value}
-                                    defaultValue={item.value?item.value:null}
-                                    activeUnderlineColor={Colors.DEFAULT_BLUE}
-                                    focusable={true}
-                                  />
-                                )
-  
-  
-                                // </View>
-                              )}
-  
-                            </View>
-                            ) }
+                                    defaultValue={item.value ? item.value : null}
+                                  />) : (
+
+                                    <View style={{ flex: 1, flexDirection: 'row' }}>
+
+                                      <TextInput
+                                        placeholder={`${item.placeholder}                                                         `}
+                                        keyboardType={item?.keyboard ? item?.keyboard : 'default'}
+                                        placeholderTextColor={'gray'}
+                                        selectionColor={Colors.DEFAULT_GREY}
+                                        style={[mstyle.inputText, { backgroundColor: item?.read_only ? 'silver' : '' }]}
+                                        multiline={item?.type == 'textarea' ? true : false} numberOfLines={item?.type === 'textarea' ? 6 : 1}
+                                        onChangeText={text => {
+                                          item.value = text
+                                          // // console.log(item)
+                                        }}
+                                        // value={item?.value}
+                                        defaultValue={item.value ? item.value : null}
+                                        activeUnderlineColor={Colors.DEFAULT_BLUE}
+                                        focusable={true}
+                                      />
+
+                                      {item?.type == 'qrcode' ? (
+                                        <Qrscreen item={item} inputrefresh={refresonefield}/>
+                                        ): ''}
+                                    </View>
+                                  )
+
+
+                                  // </View>
+                                )}
+
+                              </View>
+                            )}
 
                           </View>
 
-                         
+
 
                         )}
 

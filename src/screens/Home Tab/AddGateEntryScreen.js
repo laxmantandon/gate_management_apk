@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Pressable, Alert, ToastAndroid, TextInput, ScrollView } from 'react-native'
+import { View, Text, FlatList, Pressable, Alert, ToastAndroid, TextInput, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import MYinputs from '../../components/Myinputs'
 import submitReqData from '../../services/FormData'
@@ -12,13 +12,16 @@ import CartScreen from '../../components/CartScreen'
 import mstyle from '../../components/mstyle'
 import HTMLView from 'react-native-htmlview';
 import moment from 'moment'
+import QrscannerScreeen from '../QrscannerScreeen'
+import { RNCamera } from 'react-native-camera'
+import QRCodeScanner from 'react-native-qrcode-scanner'
 
 
-const AddLeadScreen = ({ navigation, route: {
+const AddGateEntryScreen = ({ navigation, route: {
   params: { item },
 }, }) => {
   const [FormData, setFormData] = useState([
-    {label:'Vehicle Number', placeholder:'CG 04 HU 1245', key:'vehicle_number'},
+    {label:'Vehicle Number', placeholder:'CG 04 HU 1245', type:"qrcode", key:'vehicle_number'},
     {label:'Entry Type', type:"select", options:['Pickup', 'Drop'], key:'type'},
     {label:'Notes', placeholder:'Add Notes', type:'textarea', key:'notes'},
     {label:'Add Bill images', value:[], type:'image', key:'images'},
@@ -169,7 +172,7 @@ if(valid){
 
     }else{
       
-req.in_time=moment(new Date()).format('yy-MM-DD')
+// req.in_time=moment(new Date()).format('yy-MM-DD')
       frappe.new_doc('Gate Entry',req).then((result)=>{
         console.log('result',result)
        
@@ -258,7 +261,16 @@ req.in_time=moment(new Date()).format('yy-MM-DD')
   return (
     <ScrollView>
       <Frappe_Model loading={loading} text={loading_text} />
-      {/* <Text>AddLeadScreen</Text> */}
+      {/* <Text>AddGateEntryScreen</Text> */}
+
+      {/* <QRCodeScanner
+                  onRead={(e) => { console.log(e.data) }}
+                  reactivate={true}
+                  showMarker={true}
+                  flashMode={RNCamera.Constants.FlashMode.auto}
+                  cameraContainerStyle={{}}
+                  buttonPositive='false'
+                /> */}
       <FlatList
        onRefresh={()=>{
       }}
@@ -278,10 +290,12 @@ req.in_time=moment(new Date()).format('yy-MM-DD')
               });
             }
           }
+
+          if(item.key=="vehicle_number"){
+            item.type="qrcode"
+          }
           return (
-            <Pressable style={{ flex: 1  }}
-           
-            >
+            <Pressable style={{ flex: 1  }}>
               {/* <Text>value :-{item.value}</Text> */}
                               { item.type=='Items'?(<CartScreen item={item} />):(<MYinputs item={item} />) }
 
@@ -310,4 +324,4 @@ req.in_time=moment(new Date()).format('yy-MM-DD')
   )
 }
 
-export default AddLeadScreen
+export default AddGateEntryScreen

@@ -14,7 +14,7 @@ import moment from 'moment'
 import { AuthContext } from '../../components/context'
 
 
-const LeadScreen = ({ navigation, doc_name}) => {
+const GateEntryList = ({ navigation, doc_name}) => {
   const { signOut } = React.useContext(AuthContext);
 
   const [ListData, setListData] = useState([])
@@ -102,7 +102,7 @@ const LeadScreen = ({ navigation, doc_name}) => {
 
   const getData = () => {
     setloading(true)
-    frappe.get_list('Gate Entry',filters={}, fields=["*"],start=start_limit).then((resp)=>{
+    frappe.get_list('Gate Entry',filters=[["Gate Entry","out_time","is","not set"]], fields=["*"],start=start_limit).then((resp)=>{
       // console.log(resp)
       setloading(false)
       if(resp.data){
@@ -156,7 +156,7 @@ const LeadScreen = ({ navigation, doc_name}) => {
   const CloseEntry=(g_item)=>{
     let req={
       name:g_item.data.name,
-      out_time: moment(new Date()).format('yy-MM-DD hh:mm:ss')
+      out_time: moment(new Date()).format('yy-MM-DD HH:mm:ss')
     }
     console.log(req)
     frappe.set_doc('Gate Entry',req).then((result)=>{
@@ -229,8 +229,7 @@ const LeadScreen = ({ navigation, doc_name}) => {
           numColumns={1}
           renderItem={(item) => {
             return (
-              <Pressable
-
+              <Pressable 
               onLongPress={()=>{
                 if(!item.item.data.out_time ){
                 Alert.alert('Confirm!', 'Do You Wants To Close Gate Entry',
@@ -250,7 +249,7 @@ const LeadScreen = ({ navigation, doc_name}) => {
               onPressIn={() => { 
                 console.log(user_role)
                 if(!item.item.data.out_time && user_role=='logistics'){
-                navigation.navigate('AddLead',item=item)
+                navigation.navigate('AddGateEntry',item=item)
                 }
                  }}>
                 <Card item={item} />
@@ -277,7 +276,7 @@ const LeadScreen = ({ navigation, doc_name}) => {
           }}
         />
       </ScrollView>
-      <Pressable onPressIn={() => { navigation.navigate('AddLead',item={}) }} >
+      <Pressable onPressIn={() => { navigation.navigate('AddGateEntry',item={}) }} >
         <FabButton />
 
       </Pressable>
@@ -285,4 +284,4 @@ const LeadScreen = ({ navigation, doc_name}) => {
   )
 }
 
-export default LeadScreen
+export default GateEntryList
